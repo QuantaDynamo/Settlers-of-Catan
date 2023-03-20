@@ -3,35 +3,46 @@ type resource = Wheat | Sheep | Brick | Wood | Ore | Desert
 type port = { port_resource : resource; ratio : int }
 
  
+
+let test_resource res= 
+  match res with
+  | "Wheat" -> Wheat
+  | "Sheep" -> Sheep
+  | "Brick" -> Brick
+  | "Wood" -> Wood
+  | "Ore" -> Ore
+  | "Desert" -> Desert
+  | _ -> Wheat
+
 type tile = {
-  id : int;
+  tile_id : int;
   resource : resource;
   dice_num : int;
   has_robber : bool;
 }
 
 let init_tile i res dice = {
-  id = i; 
+  tile_id = i; 
   resource = res;
   dice_num = dice;
   has_robber = false
 }
 
 type edge = {
-  id : int;
+  edge_id : int;
   has_road : bool;
   owner : player option;
 
 }
 
 let init_edge i = {
-  id = i; 
+  edge_id = i; 
   has_road = false;
   owner = None;
 }
 
 type node = {
-  id : int;
+  node_id : int;
   adj_nodes : node list;
   adj_edges : edge list;
   adj_tiles : tile list;
@@ -42,7 +53,7 @@ type node = {
 }
 
 let init_node i node_list edge_list tile_list = {
-  id = i; 
+  node_id = i; 
   adj_nodes = node_list;
   adj_edges = edge_list;
   adj_tiles = tile_list;
@@ -221,3 +232,16 @@ let node_list = [
   
 ]
 
+let get_tile ind tiles = List.find(fun t -> t.tile_id = ind) tiles
+
+let get_node ind nodes = List.find(fun n -> n.node_id = ind) nodes
+
+let get_edge ind edges = List.find(fun e -> e.edge_id = ind) edges
+
+let build_road ind road = List.map(fun e ->
+  if e.edge_id = ind then road else get_edge ind edge_list) edge_list
+
+let build_settlement ind sett = List.map(fun n ->
+  if n.node_id = ind then sett else get_node ind node_list) node_list
+
+let get_resource ind = tile_list |> List.filter (fun dice -> dice.dice_num = ind) |> List.map (fun res -> res.resource)

@@ -1,2 +1,3 @@
 (library
- (name gamestate))
+ (name game)
+ (public_name Game))
