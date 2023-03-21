@@ -10,7 +10,8 @@ type command = Start | Quit | Roll
 let command_messages = function
   | Start -> "Hello! Welcome to Settlers of Caml-tan!"
   | Roll ->
-      "You've rolled a and have moved to tile. The resource you collected is "
+      let p, q = roll_dice () in
+      "You've rolled a" ^ string_of_int (p + q) ^ "and have moved to that tile."
   | Quit -> "Thank you for playing Settlers of Caml-tan! See you next time!"
 
 let new_cmd cmd =
