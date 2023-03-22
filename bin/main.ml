@@ -4,6 +4,7 @@ open Gamestate
 
 let rec play_game game =
   let rec game_loop game =
+    ignore (Sys.command "clear");
     print_endline "What would you like to do? (start, roll, quit)";
     let cmd_str = read_line () in
     let cmd = parse_string cmd_str in
