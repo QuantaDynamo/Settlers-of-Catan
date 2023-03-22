@@ -1,6 +1,7 @@
 To install and run Settlers of Caml-tan, please follow these instructions:
 
-1. Install Ocaml using this link: 
+1. Install Ocaml using this link:
+ https://cs3110.github.io/textbook/chapters/preface/install.html
 2. Open a new terminal 
 3. Run "make build"
 4. Type "make play" into command line  
@@ -9,5 +10,5 @@ To install and run Settlers of Caml-tan, please follow these instructions:
 quit : quits the game
 roll : rolls the dice and moves the player accordingly
 
-Note: If you do not properly input a command two times consecutively, 
-the program will quit. 
+Note: If you do not properly input a command more than two times consecutively, 
+the program will likely quit. 
