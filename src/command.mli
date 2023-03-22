@@ -1,7 +1,7 @@
 exception Empty
 exception Invalid
 
-type command = Start | Quit | Roll
+type command = Start | Quit | Roll | Empty | Invalid
 
 val parse_string : string -> command
 (** [parse_string] parses a player's string input into a command. It converts all

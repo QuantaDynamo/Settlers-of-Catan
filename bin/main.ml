@@ -8,8 +8,7 @@ let rec play_game game =
     print_endline "What would you like to do? (start, roll, quit)";
     let cmd_str = read_line () in
     let cmd = parse_string cmd_str in
-    try
-      match cmd with
+    match cmd with
       | Start ->
           ANSITerminal.print_string [ ANSITerminal.blue ]
             "Hello! You are now playing Settlers of Caml-tan. Please enter a \
@@ -27,15 +26,14 @@ let rec play_game game =
             ^ string_of_int (p + q)
             ^ " and have moved to that tile. \n");
           game_loop game
-    with
-    | Empty ->
-        ANSITerminal.print_string [ ANSITerminal.blue ]
+      | Empty ->
+          ANSITerminal.print_string [ ANSITerminal.blue ]
           "Please enter a command. \n";
-        game_loop game
-    | Invalid ->
-        ANSITerminal.print_string [ ANSITerminal.blue ]
+          game_loop game
+      | Invalid -> 
+          ANSITerminal.print_string [ ANSITerminal.blue ]
           "Invalid command. Please try again. \n";
-        game_loop game
+          game_loop game
   in
   game_loop game
 
