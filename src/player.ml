@@ -1,6 +1,14 @@
 type resource = Wheat | Sheep | Brick | Wood | Ore | Desert
 type color = Red | Blue | Yellow | Green | Brown | White
 
+let string_of_color = function
+  | Red -> "Red"
+  | Blue -> "Blue"
+  | Yellow -> "Yellow"
+  | Green -> "Green"
+  | Brown -> "Brown"
+  | White -> "White"
+
 type development_card =
   | Knight
   | VictoryPoint

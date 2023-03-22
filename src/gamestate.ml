@@ -1,5 +1,4 @@
 open Player
-open Board
 
 type game_state = {
   current_player : player;
@@ -16,6 +15,28 @@ type game_state = {
 let roll_dice () =
   Random.self_init ();
   (1 + Random.int 6, 1 + Random.int 6)
+
+let init_state =
+  {
+    current_player =
+      {
+        player_color = Red;
+        resources = [];
+        development_cards = [];
+        score = 0;
+        num_settlements = 0;
+        num_cities = 0;
+        num_roads = 0;
+      };
+    game_over = false;
+    dice = 0;
+    victory_points = [];
+    dc_bank = [];
+    r_bank = [];
+    largest_army = None;
+    longest_road = None;
+    winner = None;
+  }
 
 
 let start_game =

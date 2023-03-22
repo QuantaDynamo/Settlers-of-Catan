@@ -1,17 +1,20 @@
 open OUnit2
-open Game
+open Catan
 open Board
 open Gamestate
 open Player
 
-let get_tile_test (name : string) (ind : int) (tiles : Board.tile list) (expected_output : Board.tile) : test = name >:: fun _ ->
-  assert_equal expected_output (get_tile ind tiles)
+let get_tile_test (name : string) (ind : int) (tiles : Board.tile list)
+    (expected_output : Board.tile) : test =
+  name >:: fun _ -> assert_equal expected_output (get_tile ind tiles)
 
-let get_node_test (name : string) (ind : int) (nodes : Board.node list) (expected_output : Board.node) : test = name >:: fun _ ->
-  assert_equal expected_output (get_node ind nodes)
+let get_node_test (name : string) (ind : int) (nodes : Board.node list)
+    (expected_output : Board.node) : test =
+  name >:: fun _ -> assert_equal expected_output (get_node ind nodes)
 
-let get_edge_test (name : string) (ind : int) (edges : Board.edge list) (expected_output : Board.edge) : test = name >:: fun _ ->
-  assert_equal expected_output (get_edge ind edges)
+let get_edge_test (name : string) (ind : int) (edges : Board.edge list)
+    (expected_output : Board.edge) : test =
+  name >:: fun _ -> assert_equal expected_output (get_edge ind edges)
 
 let printer_edges = fun l -> String.concat "; " (List.map string_of_edge l)
 
@@ -64,8 +67,5 @@ let boardchange_tests = [
   (* display_test "Check" (build_settlement 7 player_test) (display node_test) *)
   ]
 
-let suite =
-  "test suite for game"
-  >::: List.flatten [ boardchange_tests; ]
-
+let suite = "test suite for game" >::: List.flatten [ boardchange_tests ]
 let _ = run_test_tt_main suite

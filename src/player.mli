@@ -1,9 +1,16 @@
 type resource
-type color
-
+type color = Red | Blue | Yellow | Green | Brown | White
 type development_card
 
-type player
+type player = {
+  player_color : color;
+  resources : resource list;
+  development_cards : development_card list;
+  score : int;
+  num_settlements : int;
+  num_cities : int;
+  num_roads : int;
+}
 
 type settlement
 type city
