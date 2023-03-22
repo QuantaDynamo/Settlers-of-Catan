@@ -38,5 +38,5 @@ val build_settlement : int -> Player.player -> node list
     Requires: [ind] is an integer in the range 0-53 and [node] is of type n. *)
 
 val get_resource : int -> (int * resource) list
-(** [get_resource ind] returns the list of nodes including the modified node.
-    Requires: [ind] is an integer in the range 0-53 and [node] is of type n. *)
+(** [get_resource ind] returns the list of tiles correspodning to that number on the dice roll
+    Requires: [ind] is an integer in the range 2-12. *)
