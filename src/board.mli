@@ -8,7 +8,7 @@ val node_list : node list
 val edge_list : edge list
 val test_resource : string -> resource
 val init_tile : int -> resource -> int -> tile
-val init_node : int -> node list -> edge list -> tile list -> node
+val init_node : int -> int list -> int list -> int list -> node
 val init_edge : int -> edge
 val string_resource: resource -> string
 val string_of_edge: edge -> string
