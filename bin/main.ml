@@ -32,7 +32,6 @@ let rec play_game game =
         let p, q = roll_dice () in
         ANSITerminal.print_string [ ANSITerminal.blue ]
           ("You've rolled a " ^ string_of_int (p + q) ^ "!");
-        ANSITerminal.print_string [ ANSITerminal.blue ] (Board.display b.board);
         game_loop game
     | Settle ->
         (* let nodes = Board.node_list in *)
