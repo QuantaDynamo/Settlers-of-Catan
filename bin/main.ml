@@ -31,9 +31,7 @@ let rec play_game game =
     | Roll ->
         let p, q = roll_dice () in
         ANSITerminal.print_string [ ANSITerminal.blue ]
-          ("You've rolled a "
-          ^ string_of_int (p + q)
-          ^ " and have moved to that tile. \n");
+          ("You've rolled a " ^ string_of_int (p + q) ^ "!");
         ANSITerminal.print_string [ ANSITerminal.blue ] (Board.display b.board);
         game_loop game
     | Settle ->
