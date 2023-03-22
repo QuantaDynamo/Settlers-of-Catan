@@ -37,3 +37,17 @@ let init_state =
     longest_road = None;
     winner = None;
   }
+
+
+let start_game =
+  {
+    current_player = player_test;
+    game_over = false;
+    dice = 2;
+    victory_points = [4; 3];
+    dc_bank = [];
+    r_bank= [];
+    largest_army = None;
+    longest_road = None;
+    winner = None;
+  }

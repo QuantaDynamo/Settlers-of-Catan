@@ -1,9 +1,8 @@
 open Player
 
 type resource = Wheat | Sheep | Brick | Wood | Ore | Desert
-type port = { port_resource : resource; ratio : int }
 
-let test_resource res =
+let test_resource res = 
   match res with
   | "Wheat" -> Wheat
   | "Sheep" -> Sheep
@@ -13,6 +12,19 @@ let test_resource res =
   | "Desert" -> Desert
   | _ -> Wheat
 
+let string_resource res = 
+  match res with
+  | Wheat -> "Wheat"
+  | Desert -> "Desert"
+  | Sheep -> "Sheep"
+  | Brick -> "Brick"
+  | Wood -> "Wood"
+  | Ore -> "Ore"
+
+type port = { port_resource : resource; ratio : int }
+
+let string_of_port p = Printf.sprintf "{port_resource=%s; ratio=%d;}" (string_resource p.port_resource) p.ratio
+
 type tile = {
   tile_id : int;
   resource : resource;
@@ -20,10 +32,16 @@ type tile = {
   has_robber : bool;
 }
 
+let string_of_tile t = Printf.sprintf "{tile_id=%d; resource=%s; dice_num=%d; has_robber=%b; \n}"
+t.tile_id (string_resource t.resource) t.dice_num t.has_robber
+
 let init_tile i res dice =
   { tile_id = i; resource = res; dice_num = dice; has_robber = false }
 
 type edge = { edge_id : int; has_road : bool; owner : player option }
+
+let string_of_edge e = Printf.sprintf "{edge_id=%d; has_road=%b; owner=%s; \n}"
+e.edge_id e.has_road (match e.owner with | Some i -> string_of_player i | None -> "no owner")
 
 let init_edge i = { edge_id = i; has_road = false; owner = None }
 
@@ -36,6 +54,15 @@ type node = {
   has_settlement : bool;
   owner : player option;
 }
+
+let string_of_adj_node n = Printf.sprintf "{node_id=%d; port=%s; has_settlement=%b; owner=%s;}" 
+n.node_id "d" n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
+let adj_nodes_to_string = fun l -> String.concat "; " (List.map string_of_adj_node l)
+let adj_edges_to_string = fun l -> String.concat "; " (List.map string_of_edge l)
+let adj_tiles_to_string = fun l -> String.concat "; " (List.map string_of_tile l)
+let string_of_node n = Printf.sprintf "{node_id=%d; adj_nodes=%s; adj_edges=%s; adj_tiles=%s; port=%s; has_settlement=%b; owner=%s; \n}"
+n.node_id (adj_nodes_to_string n.adj_nodes) (adj_edges_to_string n.adj_edges) (adj_tiles_to_string n.adj_tiles) (string_of_port n.port)
+n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
 
 let init_node i node_list edge_list tile_list =
   {
@@ -209,17 +236,76 @@ let get_tile ind tiles = List.find (fun t -> t.tile_id = ind) tiles
 let get_node ind nodes = List.find (fun n -> n.node_id = ind) nodes
 let get_edge ind edges = List.find (fun e -> e.edge_id = ind) edges
 
-let build_road ind road =
+let build_road ind player = 
   List.map
-    (fun e -> if e.edge_id = ind then road else get_edge ind edge_list)
+    (fun e -> if e.edge_id = ind then {edge_id = e.edge_id; has_road = true; owner = Some player} else get_edge e.edge_id edge_list)
     edge_list
 
-let build_settlement ind sett =
+let build_settlement ind player =
   List.map
-    (fun n -> if n.node_id = ind then sett else get_node ind node_list)
+    (fun n -> if n.node_id = ind 
+      then 
+        {
+          node_id = n.node_id;
+          adj_nodes = n.adj_nodes;
+          adj_edges = n.adj_edges;
+          adj_tiles = n.adj_tiles;
+          port = n.port;
+          has_settlement = true;
+          owner = Some player;
+        }
+      else get_node n.node_id node_list)
     node_list
 
 let get_resource ind =
   tile_list
   |> List.filter (fun dice -> dice.dice_num = ind)
-  |> List.map (fun res -> res.resource)
+  |> List.map (fun res -> (res.tile_id, res.resource))
+
+
+let rec spacer n = if n = 0 then "" else " " ^ spacer (n - 1)
+let generator10 n str = str^ (spacer (10 - n)) 
+let generator5 n str = str^ (spacer (5 - n))
+let display_even n1 n2 n3 n4 n5 n6 n7 = "[" ^ generator10 (String.length n1) n1 ^ generator10 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
+generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator10 (String.length n6) n6 ^ generator5 (String.length n7) n7 ^"]" ^ "\n"
+
+let display_odd n1 n2 n3 n4 n5 n6 n7 n8 = "[" ^ generator10 (String.length n1) n1 ^ generator5 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
+generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator5 (String.length n6) n6 ^ generator10 (String.length n7) n7 ^ 
+generator5 (String.length n8) n8 ^ "]" ^ "\n"
+
+let display_mid n1 n2 n3 n4 n5 n6 n7 = "[" ^ generator5 (String.length n1) n1 ^ generator10 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
+generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator10 (String.length n6) n6 ^ generator10 (String.length n7) n7 ^ "]" ^ "\n"
+
+let display_blank = "\n" ^ "\n"
+
+
+let player_string ind nodes = (match (get_node ind nodes).owner with | Some i -> node_color i | None -> "none")
+let display_3 n1 n2 n3 = display_even "" "" n1 n2 n3 "" ""
+let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n3 "" ""
+let display_5 n1 n2 n3 n4 n5 = display_even "" n1 n2 n3 n4 n5 ""
+let display nodes= "\n" ^
+display_3 (player_string 0 nodes) (player_string 1 nodes) (player_string 2 nodes) ^
+display_blank ^
+display_4  (player_string 3 nodes) (player_string 4 nodes) (player_string 5 nodes) (player_string 6 nodes) ^
+display_blank ^
+display_4  (player_string 7 nodes) (player_string 8 nodes) (player_string 9 nodes) (player_string 10 nodes) ^
+display_blank ^
+display_5  (player_string 11 nodes) (player_string 12 nodes) (player_string 13 nodes) (player_string 14 nodes) (player_string 15 nodes) ^
+display_blank ^
+display_5  (player_string 16 nodes) (player_string 17 nodes) (player_string 18 nodes) (player_string 19 nodes) (player_string 20 nodes) ^
+display_blank ^
+(display_mid "" (player_string 21 nodes) (player_string 22 nodes) (player_string 23 nodes) (player_string 24 nodes) (player_string 25 nodes) (player_string 26 nodes)) ^
+display_blank ^
+(display_mid "" (player_string 27 nodes) (player_string 28 nodes) (player_string 29 nodes) (player_string 30 nodes) (player_string 31 nodes) (player_string 32 nodes)) ^
+display_blank ^
+display_5  (player_string 33 nodes) (player_string 34 nodes) (player_string 35 nodes) (player_string 36 nodes) (player_string 37 nodes) ^
+display_blank ^
+display_5  (player_string 38 nodes) (player_string 39 nodes) (player_string 40 nodes) (player_string 41 nodes) (player_string 42 nodes) ^
+display_blank ^
+display_4  (player_string 43 nodes) (player_string 44 nodes) (player_string 45 nodes) (player_string 46 nodes) ^
+display_blank ^
+display_4  (player_string 47 nodes) (player_string 48 nodes) (player_string 49 nodes) (player_string 50 nodes) ^
+display_blank ^
+display_3 (player_string 51 nodes) (player_string 51 nodes) (player_string 53 nodes) ^
+display_blank ^
+display_blank

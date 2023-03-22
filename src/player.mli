@@ -18,5 +18,6 @@ type road
 type port
 type intersection
 
-val string_of_color : color -> string
-(** [string_of_color] converts a player color to a string version of their color *)
+val player_test: player
+val string_of_player: player -> string
+val node_color: player -> string
