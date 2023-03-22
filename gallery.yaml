@@ -19,7 +19,7 @@ publish: true
 # Pithy title
 title: "Settlers of Caml-tan"
 # OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
-git-repo: "https://github.coecis.cornell.edu/mh2296/placeholderk"
+git-repo: "https://github.coecis.cornell.edu/mh2296/placeholder"
 # If you have no demo screencast, replace the url string with an empty string ""
 demo-video-url: ""
 # Write a short, attention-grabbing description of your project.
