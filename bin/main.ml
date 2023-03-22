@@ -11,7 +11,7 @@ let b = { board = Board.node_list; player = Player.player_test }
 let rec play_game game =
   let rec game_loop game =
     ignore (Sys.command "clear");
-    print_endline "What would you like to do? (start, roll, quit)";
+    print_endline "What would you like to do? (start, roll, quit, settle)";
     let cmd_str = read_line () in
     let cmd = parse_string cmd_str in
     match cmd with
