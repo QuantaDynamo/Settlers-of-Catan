@@ -11,6 +11,7 @@ To install and run Settlers of Caml-tan, please follow these instructions:
 8. Follow these commands: 
 quit : quits the game
 roll : rolls the dice and moves the player accordingly
+settle: settles a node with player Red.
 
 Note: If you do not properly input a command more than two times consecutively, 
 the program will likely quit.
