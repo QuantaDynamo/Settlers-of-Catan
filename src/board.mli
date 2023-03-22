@@ -8,7 +8,7 @@ val node_list : node list
 val edge_list : edge list
 val test_resource : string -> resource
 val init_tile : int -> resource -> int -> tile
-val init_node : int -> node list -> edge list -> tile list -> node
+val init_node : int -> int list -> int list -> int list -> node
 val init_edge : int -> edge
 val string_resource: resource -> string
 val string_of_edge: edge -> string
@@ -38,5 +38,5 @@ val build_settlement : int -> Player.player -> node list
     Requires: [ind] is an integer in the range 0-53 and [node] is of type n. *)
 
 val get_resource : int -> (int * resource) list
-(** [get_resource ind] returns the list of nodes including the modified node.
-    Requires: [ind] is an integer in the range 0-53 and [node] is of type n. *)
+(** [get_resource ind] returns the list of tiles correspodning to that number on the dice roll
+    Requires: [ind] is an integer in the range 2-12. *)

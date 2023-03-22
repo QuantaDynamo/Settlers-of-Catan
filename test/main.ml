@@ -8,9 +8,10 @@ let get_tile_test (name : string) (ind : int) (tiles : Board.tile list)
     (expected_output : Board.tile) : test =
   name >:: fun _ -> assert_equal expected_output (get_tile ind tiles)
 
+let print_node n = string_of_node n
 let get_node_test (name : string) (ind : int) (nodes : Board.node list)
     (expected_output : Board.node) : test =
-  name >:: fun _ -> assert_equal expected_output (get_node ind nodes)
+  name >:: fun _ -> assert_equal expected_output (get_node ind nodes) ~printer:print_node
 
 let get_edge_test (name : string) (ind : int) (edges : Board.edge list)
     (expected_output : Board.edge) : test =
@@ -50,12 +51,12 @@ let brick_test = test_resource "Brick"
 let ore_test = test_resource "Ore"
 
 let boardchange_tests = [
-  get_tile_test "Check tile of index 0" 0 tile_test (Board.init_tile 0 wheat_test 2);
-  get_tile_test "Check tile of index " 18 tile_test (Board.init_tile 18 desert_test 0);
-  get_node_test "Check node of index 0" 0 node_test (Board.init_node 0 [] [] []);
-  get_node_test "Check node of index 53" 53 node_test (Board.init_node 53 [] [] []);
-  get_edge_test "Check edge of index 0" 0 edge_test (Board.init_edge 0);
-  get_edge_test "Check edge of index 71" 71 edge_test (Board.init_edge 71);
+  get_tile_test "Check tile of index 0" 0 tile_test (init_tile 0 wheat_test 2);
+  get_tile_test "Check tile of index " 18 tile_test (init_tile 18 desert_test 0);
+  get_node_test "Check node of index 0" 0 node_test (init_node 0 [1;8] [0;6] [0]);
+  get_node_test "Check node of index 53" 53 node_test (init_node 53 [45;52] [65;71] [18]);
+  get_edge_test "Check edge of index 0" 0 edge_test (init_edge 0);
+  get_edge_test "Check edge of index 71" 71 edge_test (init_edge 71);
   (* build_road_test "Check" 4 player_test edge_test; *)
   (* build_settlement_test "Check" 4 player_test node_test; *)
   get_resource_test "Check when dice roll has one resource" 11 [(15, brick_test); (16, ore_test)];

@@ -47,9 +47,9 @@ let init_edge i = { edge_id = i; has_road = false; owner = None }
 
 type node = {
   node_id : int;
-  adj_nodes : node list;
-  adj_edges : edge list;
-  adj_tiles : tile list;
+  adj_nodes : int list;
+  adj_edges : int list;
+  adj_tiles : int list;
   port : port;
   has_settlement : bool;
   owner : player option;
@@ -57,9 +57,9 @@ type node = {
 
 let string_of_adj_node n = Printf.sprintf "{node_id=%d; port=%s; has_settlement=%b; owner=%s;}" 
 n.node_id "d" n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
-let adj_nodes_to_string = fun l -> String.concat "; " (List.map string_of_adj_node l)
-let adj_edges_to_string = fun l -> String.concat "; " (List.map string_of_edge l)
-let adj_tiles_to_string = fun l -> String.concat "; " (List.map string_of_tile l)
+let adj_nodes_to_string = fun l -> String.concat "; " (List.map string_of_int l)
+let adj_edges_to_string = fun l -> String.concat "; " (List.map string_of_int l)
+let adj_tiles_to_string = fun l -> String.concat "; " (List.map string_of_int l)
 let string_of_node n = Printf.sprintf "{node_id=%d; adj_nodes=%s; adj_edges=%s; adj_tiles=%s; port=%s; has_settlement=%b; owner=%s; \n}"
 n.node_id (adj_nodes_to_string n.adj_nodes) (adj_edges_to_string n.adj_edges) (adj_tiles_to_string n.adj_tiles) (string_of_port n.port)
 n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
@@ -176,60 +176,60 @@ let edge_list =
 
 let node_list =
   [
-    init_node 0 [] [] [];
-    init_node 1 [] [] [];
-    init_node 2 [] [] [];
-    init_node 3 [] [] [];
-    init_node 4 [] [] [];
-    init_node 5 [] [] [];
-    init_node 6 [] [] [];
-    init_node 7 [] [] [];
-    init_node 8 [] [] [];
-    init_node 9 [] [] [];
-    init_node 10 [] [] [];
-    init_node 11 [] [] [];
-    init_node 12 [] [] [];
-    init_node 13 [] [] [];
-    init_node 14 [] [] [];
-    init_node 15 [] [] [];
-    init_node 16 [] [] [];
-    init_node 17 [] [] [];
-    init_node 18 [] [] [];
-    init_node 19 [] [] [];
-    init_node 20 [] [] [];
-    init_node 21 [] [] [];
-    init_node 22 [] [] [];
-    init_node 23 [] [] [];
-    init_node 24 [] [] [];
-    init_node 25 [] [] [];
-    init_node 26 [] [] [];
-    init_node 27 [] [] [];
-    init_node 28 [] [] [];
-    init_node 29 [] [] [];
-    init_node 30 [] [] [];
-    init_node 31 [] [] [];
-    init_node 32 [] [] [];
-    init_node 33 [] [] [];
-    init_node 34 [] [] [];
-    init_node 35 [] [] [];
-    init_node 36 [] [] [];
-    init_node 37 [] [] [];
-    init_node 38 [] [] [];
-    init_node 39 [] [] [];
-    init_node 40 [] [] [];
-    init_node 41 [] [] [];
-    init_node 42 [] [] [];
-    init_node 43 [] [] [];
-    init_node 44 [] [] [];
-    init_node 45 [] [] [];
-    init_node 46 [] [] [];
-    init_node 47 [] [] [];
-    init_node 48 [] [] [];
-    init_node 49 [] [] [];
-    init_node 50 [] [] [];
-    init_node 51 [] [] [];
-    init_node 52 [] [] [];
-    init_node 53 [] [] [];
+    init_node 0 [1;8] [0;6] [0];
+    init_node 1 [0;2] [0;1] [0];
+    init_node 2 [1;3;10] [1;2;7] [0;1];
+    init_node 3 [2;4] [2;3] [1];
+    init_node 4 [3;5;12] [3;4;8] [1;2];
+    init_node 5 [4;6] [4;5] [2];
+    init_node 6 [5;14] [5;9] [2];
+    init_node 7 [8;17] [10;18] [3];
+    init_node 8 [0;7;9] [6;10;11] [0;3];
+    init_node 9 [8;10;19] [11;12;19] [0;3;4];
+    init_node 10 [2;9;11] [7;12;13] [0;1;4];
+    init_node 11 [10;12;21] [13;14;20] [1;4;5];
+    init_node 12 [4;11;13] [8;14;15] [1;2;5];
+    init_node 13 [12;14;23] [15;16;21] [2;5;6];
+    init_node 14 [6;13;15] [9;16;17] [2;6];
+    init_node 15 [14;25] [17;22] [6];
+    init_node 16 [17;27] [23;33] [7];
+    init_node 17 [7;16;18] [18;23;24] [3;7];
+    init_node 18 [17;19;29] [24;25;34] [3;7;8];
+    init_node 19 [9;18;20] [19;25;26] [3;4;8];
+    init_node 20 [19;21;31] [26;27;35] [4;8;9];
+    init_node 21 [11;20;22] [20;27;28] [4;5;9];
+    init_node 22 [21;23;33] [28;29;36] [5;9;10];
+    init_node 23 [13;22;24] [21;29;30] [5;6;10];
+    init_node 24 [23;25;35] [30;31;37] [6;10;11];
+    init_node 25 [15;24;26] [22;31;32] [6;11];
+    init_node 26 [25;37] [32;38] [11];
+    init_node 27 [16;28] [33;39] [7];
+    init_node 28 [27;29;38] [39;40;49] [7;12];
+    init_node 29 [18;28;30] [34;40;41] [7;8;12];
+    init_node 30 [29;31;40] [41;42;50] [8;12;13];
+    init_node 31 [20;30;32] [35;42;43] [8;9;13];
+    init_node 32 [31;33;42] [43;44;51] [9;13;14];
+    init_node 33 [22;32;34] [36;44;45] [9;10;14];
+    init_node 34 [33;35;44] [45;46;52] [10;14;15];
+    init_node 35 [24;34;36] [37;46;47] [10;11;15];
+    init_node 36 [35;37;46] [47;48;53] [11;15];
+    init_node 37 [26;36] [38;48] [11];
+    init_node 38 [28;39] [49;54] [12];
+    init_node 39 [38;40;47] [54;55;62] [12;16];
+    init_node 40 [30;39;41] [50;55;56] [12;13;16];
+    init_node 41 [40;42;49] [56;57;63] [13;16;17];
+    init_node 42 [32;41;43] [51;57;58] [13;14;17];
+    init_node 43 [42;44;51] [58;59;64] [14;17;18];
+    init_node 44 [34;43;45] [52;59;60] [14;15;18];
+    init_node 45 [44;46;53] [60;61;65] [15;18];
+    init_node 46 [36;45] [53;61] [15];
+    init_node 47 [39;48] [62;66] [16];
+    init_node 48 [47;49] [66;67] [16];
+    init_node 49 [41;48;50] [63;67;68] [16;17];
+    init_node 50 [49;51] [68;69] [17];
+    init_node 51 [43;50;52] [64;69;70] [17;18];
+    init_node 52 [51;53] [70;71] [18];
+    init_node 53 [45;52] [65;71] [18];
   ]
 
 let get_tile ind tiles = List.find (fun t -> t.tile_id = ind) tiles
