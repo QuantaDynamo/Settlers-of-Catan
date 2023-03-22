@@ -36,7 +36,7 @@ let rec play_game game =
     | Settle ->
         (* let nodes = Board.node_list in *)
         let b = { board = build_settlement 2 b.player; player = b.player } in
-        ANSITerminal.print_string [ ANSITerminal.blue ] (Board.display b.board);
+        ANSITerminal.print_string [ ANSITerminal.blue ] ("You've successfully settled!" ^ (Board.display b.board));
         game_loop game
     | Empty ->
         ANSITerminal.print_string [ ANSITerminal.blue ]
