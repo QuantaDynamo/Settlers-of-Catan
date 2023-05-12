@@ -58,11 +58,17 @@ let remove_resources (player : player) unwanted_resources : player =
 let rec game_loop game =
   ignore (Sys.command "clear");
   let current_player = List.nth game.players game.current_player in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("It's "
-    ^ string_of_color current_player.player_color
-    ^ "'s turn. What would you like to do? (start, roll, quit, settle)"
-    );
+  if current_player.score >= 10 then
+    ANSITerminal.print_string [ ANSITerminal.green ]
+      ("Congratulations, "
+      ^ string_of_color current_player.player_color
+      ^ " has won the game!\n")
+  else
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      ("It's "
+      ^ string_of_color current_player.player_color
+      ^ "'s turn. What would you like to do? (start, roll, quit, \
+         settle)");
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
   match cmd with
