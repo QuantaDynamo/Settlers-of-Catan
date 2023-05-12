@@ -45,7 +45,7 @@ val build_road : int -> Player.player -> edge list
     modified edge. Requires: [ind] is an integer in the range 0-71 and
     [edge] is of type e *)
 
-val build_settlement : int -> Player.player -> node list
+val build_settlement : int -> Player.player -> node list -> node list
 (** [build_settlement ind node] returns the list of nodes including the
     modified node. Requires: [ind] is an integer in the range 0-53 and
     [node] is of type n. *)

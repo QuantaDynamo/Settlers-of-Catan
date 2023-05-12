@@ -98,7 +98,7 @@ and settle game player =
   let b =
     {
       current_player = game.current_player;
-      board = build_settlement cmd current_player;
+      board = build_settlement cmd current_player game.board;
       players = game.players;
     }
   in

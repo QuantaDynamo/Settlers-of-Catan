@@ -322,7 +322,7 @@ let build_road ind player =
    is_connected = true; } in board.roads <- new_road :: board.roads;
    print_endline "Road built successfully!" *)
 
-let build_settlement ind player =
+let build_settlement ind player board =
   List.map
     (fun n ->
       if n.node_id = ind then
@@ -335,8 +335,8 @@ let build_settlement ind player =
           has_settlement = true;
           owner = Some player;
         }
-      else get_node n.node_id node_list)
-    node_list
+      else get_node n.node_id board)
+    board
 
 let get_resource ind =
   tile_list
