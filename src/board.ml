@@ -322,7 +322,7 @@ let build_road ind player =
    is_connected = true; } in board.roads <- new_road :: board.roads;
    print_endline "Road built successfully!" *)
 
-let build_settlement ind player =
+let build_settlement ind player board =
   List.map
     (fun n ->
       if n.node_id = ind then
@@ -335,8 +335,8 @@ let build_settlement ind player =
           has_settlement = true;
           owner = Some player;
         }
-      else get_node n.node_id node_list)
-    node_list
+      else get_node n.node_id board)
+    board
 
 let get_resource ind =
   tile_list
@@ -389,7 +389,7 @@ let player_string ind nodes =
   | None -> "none"
 
 let display_3 n1 n2 n3 = display_even "" "" n1 n2 n3 "" ""
-let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n3 "" ""
+let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n4 "" ""
 let display_5 n1 n2 n3 n4 n5 = display_even "" n1 n2 n3 n4 n5 ""
 
 let display nodes =
