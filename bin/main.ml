@@ -5,7 +5,9 @@ open Board
 open Player
 
 type game_state = {
-  board : Board.node list;
+  nodes : Board.node list;
+  edges: Board.edge list;
+  tiles: Board.tile list;
   players : Player.player list;
   mutable current_player : int;
 }
@@ -34,7 +36,9 @@ let player_two =
 
 let initial_game_state =
   {
-    board = Board.node_list;
+    nodes = Board.node_list;
+    edges = Board.edge_list;
+    tiles = Board.tile_list;
     players = [ player_one; player_two ];
     current_player = 0;
   }
@@ -149,7 +153,6 @@ and settle game player =
   print_endline "Enter the number of the node you'd like to settle";
   let cmd_str = read_line () in
   let cmd = int_of_string cmd_str in
-  let nodes = Board.node_list in
   let current_player = List.nth game.players game.current_player in
   let updated_player =
     {
@@ -165,14 +168,16 @@ and settle game player =
   in
   let b =
     {
+      nodes = build_settlement cmd current_player game.nodes;
+      edges = game.edges;
+      tiles = game.tiles;
       current_player = game.current_player;
-      board = build_settlement cmd current_player game.board;
       players = updated_players;
     }
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "You've successfully settled! ";
-  Board.draw_board Board.tile_list b.board Board.edge_list;
+  Board.draw_board Board.tile_list b.nodes b.edges;
   b
 
 (* let new_road game player = print_endline "Enter the number of the
