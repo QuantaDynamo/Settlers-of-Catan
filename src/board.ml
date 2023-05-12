@@ -43,8 +43,7 @@ type node = {
 
 type road = {
   road_id : int;
-  start_node : node;
-  end_node : node;
+  length : int;
   mutable is_connected : bool;
   mutable owner : player option;
 }
@@ -313,15 +312,6 @@ let build_road ind player board =
       else get_edge e.edge_id board)
     board
 
-(* let build_road ind player = print_endline "Please enter the node IDs
-   for the start and end of the road:"; let start_node_id = read_int ()
-   in let end_node_id = read_int () in let start_node = List.find (fun n
-   -> n.node_id = start_node_id) board.nodes in let end_node = List.find
-   (fun n -> n.node_id = end_node_id) board.nodes in let new_road = {
-   road_id = Random.int 10 + 1; start_node; end_node; owner = player;
-   is_connected = true; } in board.roads <- new_road :: board.roads;
-   print_endline "Road built successfully!" *)
-
 let build_settlement ind player board =
   List.map
     (fun n ->
@@ -466,32 +456,34 @@ let display nodes =
       (player_string 53 nodes)
   ^ display_blank ^ display_blank
 
-
 (* The color of player pl as an ANSITERMINAL.color *)
-let get_color (pl : player option) = match pl with
-  | None -> ANSITerminal.White  
-  | Some p -> match p.player_color with
+let get_color (pl : player option) =
+  match pl with
+  | None -> ANSITerminal.White
+  | Some p -> (
+      match p.player_color with
       | Red -> ANSITerminal.Red
       | Blue -> ANSITerminal.Blue
       | Yellow -> ANSITerminal.Yellow
       | Green -> ANSITerminal.Green
       | White -> ANSITerminal.White
-      | _ -> failwith "Color not supported by ANSITERMINAL"
+      | _ -> failwith "Color not supported by ANSITERMINAL")
 
-let draw_tile id text tile_lst = 
-  let t = get_tile id tile_lst in 
+let draw_tile id text tile_lst =
+  let t = get_tile id tile_lst in
   ANSITerminal.print_string [] text
 
-let draw_node id text node_lst = 
-  let n = get_node id node_lst in 
+let draw_node id text node_lst =
+  let n = get_node id node_lst in
   let color = get_color n.owner in
-  ANSITerminal.print_string [ANSITerminal.Foreground color] ("<" ^ text ^ ">")
+  ANSITerminal.print_string
+    [ ANSITerminal.Foreground color ]
+    ("<" ^ text ^ ">")
 
-let draw_edge id text edge_lst = 
-  let e = get_edge id edge_lst in 
+let draw_edge id text edge_lst =
+  let e = get_edge id edge_lst in
   let color = get_color e.owner in
-  ANSITerminal.print_string [ANSITerminal.Foreground color] text
-    
+  ANSITerminal.print_string [ ANSITerminal.Foreground color ] text
 
 let draw_board tiles nodes edges =
 ANSITerminal.print_string [] "\n";
