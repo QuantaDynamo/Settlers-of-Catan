@@ -1,29 +1,28 @@
 open Player
+open Random
 
-type resource = Wheat | Sheep | Brick | Wood | Ore | Desert
+type resource =
+  | Wheat
+  | Sheep
+  | Brick
+  | Wood
+  | Ore
+  | Desert
 
-let test_resource res = 
-  match res with
-  | "Wheat" -> Wheat
-  | "Sheep" -> Sheep
-  | "Brick" -> Brick
-  | "Wood" -> Wood
-  | "Ore" -> Ore
-  | "Desert" -> Desert
-  | _ -> Wheat
+type settlement = { owner : player }
+type city = { owner : player }
+type intersection = { owner : player option }
 
-let string_resource res = 
-  match res with
-  | Wheat -> "Wheat"
-  | Desert -> "Desert"
-  | Sheep -> "Sheep"
-  | Brick -> "Brick"
-  | Wood -> "Wood"
-  | Ore -> "Ore"
+type port = {
+  port_resource : resource;
+  ratio : int;
+}
 
-type port = { port_resource : resource; ratio : int }
-
-let string_of_port p = Printf.sprintf "{port_resource=%s; ratio=%d;}" (string_resource p.port_resource) p.ratio
+type edge = {
+  edge_id : int;
+  has_road : bool;
+  owner : player option;
+}
 
 type tile = {
   tile_id : int;
@@ -31,19 +30,6 @@ type tile = {
   dice_num : int;
   has_robber : bool;
 }
-
-let string_of_tile t = Printf.sprintf "{tile_id=%d; resource=%s; dice_num=%d; has_robber=%b; \n}"
-t.tile_id (string_resource t.resource) t.dice_num t.has_robber
-
-let init_tile i res dice =
-  { tile_id = i; resource = res; dice_num = dice; has_robber = false }
-
-type edge = { edge_id : int; has_road : bool; owner : player option }
-
-let string_of_edge e = Printf.sprintf "{edge_id=%d; has_road=%b; owner=%s; \n}"
-e.edge_id e.has_road (match e.owner with | Some i -> string_of_player i | None -> "no owner")
-
-let init_edge i = { edge_id = i; has_road = false; owner = None }
 
 type node = {
   node_id : int;
@@ -55,14 +41,92 @@ type node = {
   owner : player option;
 }
 
-let string_of_adj_node n = Printf.sprintf "{node_id=%d; port=%s; has_settlement=%b; owner=%s;}" 
-n.node_id "d" n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
-let adj_nodes_to_string = fun l -> String.concat "; " (List.map string_of_int l)
-let adj_edges_to_string = fun l -> String.concat "; " (List.map string_of_int l)
-let adj_tiles_to_string = fun l -> String.concat "; " (List.map string_of_int l)
-let string_of_node n = Printf.sprintf "{node_id=%d; adj_nodes=%s; adj_edges=%s; adj_tiles=%s; port=%s; has_settlement=%b; owner=%s; \n}"
-n.node_id (adj_nodes_to_string n.adj_nodes) (adj_edges_to_string n.adj_edges) (adj_tiles_to_string n.adj_tiles) (string_of_port n.port)
-n.has_settlement (match n.owner with | Some i -> string_of_player i | None -> "no owner")
+type road = {
+  road_id : int;
+  start_node : node;
+  end_node : node;
+  mutable is_connected : bool;
+  mutable owner : player option;
+}
+
+type board = {
+  nodes : node list;
+  mutable roads : road list;
+  players : player list;
+}
+
+let test_resource res =
+  match res with
+  | "Wheat" -> Wheat
+  | "Sheep" -> Sheep
+  | "Brick" -> Brick
+  | "Wood" -> Wood
+  | "Ore" -> Ore
+  | "Desert" -> Desert
+  | _ -> Wheat
+
+let string_resource res =
+  match res with
+  | Wheat -> "Wheat"
+  | Desert -> "Desert"
+  | Sheep -> "Sheep"
+  | Brick -> "Brick"
+  | Wood -> "Wood"
+  | Ore -> "Ore"
+
+let string_of_port p =
+  Printf.sprintf "{port_resource=%s; ratio=%d;}"
+    (string_resource p.port_resource)
+    p.ratio
+
+let string_of_tile t =
+  Printf.sprintf
+    "{tile_id=%d; resource=%s; dice_num=%d; has_robber=%b; \n}"
+    t.tile_id
+    (string_resource t.resource)
+    t.dice_num t.has_robber
+
+let init_tile i res dice =
+  { tile_id = i; resource = res; dice_num = dice; has_robber = false }
+
+let string_of_edge e =
+  Printf.sprintf "{edge_id=%d; has_road=%b; owner=%s; \n}" e.edge_id
+    e.has_road
+    (match e.owner with
+    | Some i -> string_of_player i
+    | None -> "no owner")
+
+let init_edge i = { edge_id = i; has_road = false; owner = None }
+
+let string_of_adj_node n =
+  Printf.sprintf "{node_id=%d; port=%s; has_settlement=%b; owner=%s;}"
+    n.node_id "d" n.has_settlement
+    (match n.owner with
+    | Some i -> string_of_player i
+    | None -> "no owner")
+
+let adj_nodes_to_string l =
+  String.concat "; " (List.map string_of_int l)
+
+let adj_edges_to_string l =
+  String.concat "; " (List.map string_of_int l)
+
+let adj_tiles_to_string l =
+  String.concat "; " (List.map string_of_int l)
+
+let string_of_node n =
+  Printf.sprintf
+    "{node_id=%d; adj_nodes=%s; adj_edges=%s; adj_tiles=%s; port=%s; \
+     has_settlement=%b; owner=%s; \n\
+     }"
+    n.node_id
+    (adj_nodes_to_string n.adj_nodes)
+    (adj_edges_to_string n.adj_edges)
+    (adj_tiles_to_string n.adj_tiles)
+    (string_of_port n.port) n.has_settlement
+    (match n.owner with
+    | Some i -> string_of_player i
+    | None -> "no owner")
 
 let init_node i node_list edge_list tile_list =
   {
@@ -176,75 +240,78 @@ let edge_list =
 
 let node_list =
   [
-    init_node 0 [1;8] [0;6] [0];
-    init_node 1 [0;2] [0;1] [0];
-    init_node 2 [1;3;10] [1;2;7] [0;1];
-    init_node 3 [2;4] [2;3] [1];
-    init_node 4 [3;5;12] [3;4;8] [1;2];
-    init_node 5 [4;6] [4;5] [2];
-    init_node 6 [5;14] [5;9] [2];
-    init_node 7 [8;17] [10;18] [3];
-    init_node 8 [0;7;9] [6;10;11] [0;3];
-    init_node 9 [8;10;19] [11;12;19] [0;3;4];
-    init_node 10 [2;9;11] [7;12;13] [0;1;4];
-    init_node 11 [10;12;21] [13;14;20] [1;4;5];
-    init_node 12 [4;11;13] [8;14;15] [1;2;5];
-    init_node 13 [12;14;23] [15;16;21] [2;5;6];
-    init_node 14 [6;13;15] [9;16;17] [2;6];
-    init_node 15 [14;25] [17;22] [6];
-    init_node 16 [17;27] [23;33] [7];
-    init_node 17 [7;16;18] [18;23;24] [3;7];
-    init_node 18 [17;19;29] [24;25;34] [3;7;8];
-    init_node 19 [9;18;20] [19;25;26] [3;4;8];
-    init_node 20 [19;21;31] [26;27;35] [4;8;9];
-    init_node 21 [11;20;22] [20;27;28] [4;5;9];
-    init_node 22 [21;23;33] [28;29;36] [5;9;10];
-    init_node 23 [13;22;24] [21;29;30] [5;6;10];
-    init_node 24 [23;25;35] [30;31;37] [6;10;11];
-    init_node 25 [15;24;26] [22;31;32] [6;11];
-    init_node 26 [25;37] [32;38] [11];
-    init_node 27 [16;28] [33;39] [7];
-    init_node 28 [27;29;38] [39;40;49] [7;12];
-    init_node 29 [18;28;30] [34;40;41] [7;8;12];
-    init_node 30 [29;31;40] [41;42;50] [8;12;13];
-    init_node 31 [20;30;32] [35;42;43] [8;9;13];
-    init_node 32 [31;33;42] [43;44;51] [9;13;14];
-    init_node 33 [22;32;34] [36;44;45] [9;10;14];
-    init_node 34 [33;35;44] [45;46;52] [10;14;15];
-    init_node 35 [24;34;36] [37;46;47] [10;11;15];
-    init_node 36 [35;37;46] [47;48;53] [11;15];
-    init_node 37 [26;36] [38;48] [11];
-    init_node 38 [28;39] [49;54] [12];
-    init_node 39 [38;40;47] [54;55;62] [12;16];
-    init_node 40 [30;39;41] [50;55;56] [12;13;16];
-    init_node 41 [40;42;49] [56;57;63] [13;16;17];
-    init_node 42 [32;41;43] [51;57;58] [13;14;17];
-    init_node 43 [42;44;51] [58;59;64] [14;17;18];
-    init_node 44 [34;43;45] [52;59;60] [14;15;18];
-    init_node 45 [44;46;53] [60;61;65] [15;18];
-    init_node 46 [36;45] [53;61] [15];
-    init_node 47 [39;48] [62;66] [16];
-    init_node 48 [47;49] [66;67] [16];
-    init_node 49 [41;48;50] [63;67;68] [16;17];
-    init_node 50 [49;51] [68;69] [17];
-    init_node 51 [43;50;52] [64;69;70] [17;18];
-    init_node 52 [51;53] [70;71] [18];
-    init_node 53 [45;52] [65;71] [18];
+    init_node 0 [ 1; 8 ] [ 0; 6 ] [ 0 ];
+    init_node 1 [ 0; 2 ] [ 0; 1 ] [ 0 ];
+    init_node 2 [ 1; 3; 10 ] [ 1; 2; 7 ] [ 0; 1 ];
+    init_node 3 [ 2; 4 ] [ 2; 3 ] [ 1 ];
+    init_node 4 [ 3; 5; 12 ] [ 3; 4; 8 ] [ 1; 2 ];
+    init_node 5 [ 4; 6 ] [ 4; 5 ] [ 2 ];
+    init_node 6 [ 5; 14 ] [ 5; 9 ] [ 2 ];
+    init_node 7 [ 8; 17 ] [ 10; 18 ] [ 3 ];
+    init_node 8 [ 0; 7; 9 ] [ 6; 10; 11 ] [ 0; 3 ];
+    init_node 9 [ 8; 10; 19 ] [ 11; 12; 19 ] [ 0; 3; 4 ];
+    init_node 10 [ 2; 9; 11 ] [ 7; 12; 13 ] [ 0; 1; 4 ];
+    init_node 11 [ 10; 12; 21 ] [ 13; 14; 20 ] [ 1; 4; 5 ];
+    init_node 12 [ 4; 11; 13 ] [ 8; 14; 15 ] [ 1; 2; 5 ];
+    init_node 13 [ 12; 14; 23 ] [ 15; 16; 21 ] [ 2; 5; 6 ];
+    init_node 14 [ 6; 13; 15 ] [ 9; 16; 17 ] [ 2; 6 ];
+    init_node 15 [ 14; 25 ] [ 17; 22 ] [ 6 ];
+    init_node 16 [ 17; 27 ] [ 23; 33 ] [ 7 ];
+    init_node 17 [ 7; 16; 18 ] [ 18; 23; 24 ] [ 3; 7 ];
+    init_node 18 [ 17; 19; 29 ] [ 24; 25; 34 ] [ 3; 7; 8 ];
+    init_node 19 [ 9; 18; 20 ] [ 19; 25; 26 ] [ 3; 4; 8 ];
+    init_node 20 [ 19; 21; 31 ] [ 26; 27; 35 ] [ 4; 8; 9 ];
+    init_node 21 [ 11; 20; 22 ] [ 20; 27; 28 ] [ 4; 5; 9 ];
+    init_node 22 [ 21; 23; 33 ] [ 28; 29; 36 ] [ 5; 9; 10 ];
+    init_node 23 [ 13; 22; 24 ] [ 21; 29; 30 ] [ 5; 6; 10 ];
+    init_node 24 [ 23; 25; 35 ] [ 30; 31; 37 ] [ 6; 10; 11 ];
+    init_node 25 [ 15; 24; 26 ] [ 22; 31; 32 ] [ 6; 11 ];
+    init_node 26 [ 25; 37 ] [ 32; 38 ] [ 11 ];
+    init_node 27 [ 16; 28 ] [ 33; 39 ] [ 7 ];
+    init_node 28 [ 27; 29; 38 ] [ 39; 40; 49 ] [ 7; 12 ];
+    init_node 29 [ 18; 28; 30 ] [ 34; 40; 41 ] [ 7; 8; 12 ];
+    init_node 30 [ 29; 31; 40 ] [ 41; 42; 50 ] [ 8; 12; 13 ];
+    init_node 31 [ 20; 30; 32 ] [ 35; 42; 43 ] [ 8; 9; 13 ];
+    init_node 32 [ 31; 33; 42 ] [ 43; 44; 51 ] [ 9; 13; 14 ];
+    init_node 33 [ 22; 32; 34 ] [ 36; 44; 45 ] [ 9; 10; 14 ];
+    init_node 34 [ 33; 35; 44 ] [ 45; 46; 52 ] [ 10; 14; 15 ];
+    init_node 35 [ 24; 34; 36 ] [ 37; 46; 47 ] [ 10; 11; 15 ];
+    init_node 36 [ 35; 37; 46 ] [ 47; 48; 53 ] [ 11; 15 ];
+    init_node 37 [ 26; 36 ] [ 38; 48 ] [ 11 ];
+    init_node 38 [ 28; 39 ] [ 49; 54 ] [ 12 ];
+    init_node 39 [ 38; 40; 47 ] [ 54; 55; 62 ] [ 12; 16 ];
+    init_node 40 [ 30; 39; 41 ] [ 50; 55; 56 ] [ 12; 13; 16 ];
+    init_node 41 [ 40; 42; 49 ] [ 56; 57; 63 ] [ 13; 16; 17 ];
+    init_node 42 [ 32; 41; 43 ] [ 51; 57; 58 ] [ 13; 14; 17 ];
+    init_node 43 [ 42; 44; 51 ] [ 58; 59; 64 ] [ 14; 17; 18 ];
+    init_node 44 [ 34; 43; 45 ] [ 52; 59; 60 ] [ 14; 15; 18 ];
+    init_node 45 [ 44; 46; 53 ] [ 60; 61; 65 ] [ 15; 18 ];
+    init_node 46 [ 36; 45 ] [ 53; 61 ] [ 15 ];
+    init_node 47 [ 39; 48 ] [ 62; 66 ] [ 16 ];
+    init_node 48 [ 47; 49 ] [ 66; 67 ] [ 16 ];
+    init_node 49 [ 41; 48; 50 ] [ 63; 67; 68 ] [ 16; 17 ];
+    init_node 50 [ 49; 51 ] [ 68; 69 ] [ 17 ];
+    init_node 51 [ 43; 50; 52 ] [ 64; 69; 70 ] [ 17; 18 ];
+    init_node 52 [ 51; 53 ] [ 70; 71 ] [ 18 ];
+    init_node 53 [ 45; 52 ] [ 65; 71 ] [ 18 ];
   ]
 
 let get_tile ind tiles = List.find (fun t -> t.tile_id = ind) tiles
 let get_node ind nodes = List.find (fun n -> n.node_id = ind) nodes
 let get_edge ind edges = List.find (fun e -> e.edge_id = ind) edges
 
-let build_road ind player = 
+let build_road ind player =
   List.map
-    (fun e -> if e.edge_id = ind then {edge_id = e.edge_id; has_road = true; owner = Some player} else get_edge e.edge_id edge_list)
+    (fun e ->
+      if e.edge_id = ind then
+        { edge_id = e.edge_id; has_road = true; owner = Some player }
+      else get_edge e.edge_id edge_list)
     edge_list
 
 let build_settlement ind player =
   List.map
-    (fun n -> if n.node_id = ind 
-      then 
+    (fun n ->
+      if n.node_id = ind then
         {
           node_id = n.node_id;
           adj_nodes = n.adj_nodes;
@@ -262,50 +329,125 @@ let get_resource ind =
   |> List.filter (fun dice -> dice.dice_num = ind)
   |> List.map (fun res -> (res.tile_id, res.resource))
 
-
 let rec spacer n = if n = 0 then "" else " " ^ spacer (n - 1)
-let generator10 n str = str^ (spacer (10 - n)) 
-let generator5 n str = str^ (spacer (5 - n))
-let display_even n1 n2 n3 n4 n5 n6 n7 = "[" ^ generator10 (String.length n1) n1 ^ generator10 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
-generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator10 (String.length n6) n6 ^ generator5 (String.length n7) n7 ^"]" ^ "\n"
+let generator10 n str = str ^ spacer (10 - n)
+let generator5 n str = str ^ spacer (5 - n)
 
-let display_odd n1 n2 n3 n4 n5 n6 n7 n8 = "[" ^ generator10 (String.length n1) n1 ^ generator5 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
-generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator5 (String.length n6) n6 ^ generator10 (String.length n7) n7 ^ 
-generator5 (String.length n8) n8 ^ "]" ^ "\n"
+let display_even n1 n2 n3 n4 n5 n6 n7 =
+  "["
+  ^ generator10 (String.length n1) n1
+  ^ generator10 (String.length n2) n2
+  ^ generator10 (String.length n3) n3
+  ^ generator10 (String.length n4) n4
+  ^ generator10 (String.length n5) n5
+  ^ generator10 (String.length n6) n6
+  ^ generator5 (String.length n7) n7
+  ^ "]" ^ "\n"
 
-let display_mid n1 n2 n3 n4 n5 n6 n7 = "[" ^ generator5 (String.length n1) n1 ^ generator10 (String.length n2) n2 ^ generator10 (String.length n3) n3 ^
-generator10 (String.length n4) n4 ^ generator10 (String.length n5) n5 ^ generator10 (String.length n6) n6 ^ generator10 (String.length n7) n7 ^ "]" ^ "\n"
+let display_odd n1 n2 n3 n4 n5 n6 n7 n8 =
+  "["
+  ^ generator10 (String.length n1) n1
+  ^ generator5 (String.length n2) n2
+  ^ generator10 (String.length n3) n3
+  ^ generator10 (String.length n4) n4
+  ^ generator10 (String.length n5) n5
+  ^ generator5 (String.length n6) n6
+  ^ generator10 (String.length n7) n7
+  ^ generator5 (String.length n8) n8
+  ^ "]" ^ "\n"
+
+let display_mid n1 n2 n3 n4 n5 n6 n7 =
+  "["
+  ^ generator5 (String.length n1) n1
+  ^ generator10 (String.length n2) n2
+  ^ generator10 (String.length n3) n3
+  ^ generator10 (String.length n4) n4
+  ^ generator10 (String.length n5) n5
+  ^ generator10 (String.length n6) n6
+  ^ generator10 (String.length n7) n7
+  ^ "]" ^ "\n"
 
 let display_blank = "\n" ^ "\n"
 
+let player_string ind nodes =
+  match (get_node ind nodes).owner with
+  | Some i -> node_color i
+  | None -> "none"
 
-let player_string ind nodes = (match (get_node ind nodes).owner with | Some i -> node_color i | None -> "none")
 let display_3 n1 n2 n3 = display_even "" "" n1 n2 n3 "" ""
 let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n3 "" ""
 let display_5 n1 n2 n3 n4 n5 = display_even "" n1 n2 n3 n4 n5 ""
-let display nodes= "\n" ^
-display_3 (player_string 0 nodes) (player_string 1 nodes) (player_string 2 nodes) ^
-display_blank ^
-display_4  (player_string 3 nodes) (player_string 4 nodes) (player_string 5 nodes) (player_string 6 nodes) ^
-display_blank ^
-display_4  (player_string 7 nodes) (player_string 8 nodes) (player_string 9 nodes) (player_string 10 nodes) ^
-display_blank ^
-display_5  (player_string 11 nodes) (player_string 12 nodes) (player_string 13 nodes) (player_string 14 nodes) (player_string 15 nodes) ^
-display_blank ^
-display_5  (player_string 16 nodes) (player_string 17 nodes) (player_string 18 nodes) (player_string 19 nodes) (player_string 20 nodes) ^
-display_blank ^
-(display_mid "" (player_string 21 nodes) (player_string 22 nodes) (player_string 23 nodes) (player_string 24 nodes) (player_string 25 nodes) (player_string 26 nodes)) ^
-display_blank ^
-(display_mid "" (player_string 27 nodes) (player_string 28 nodes) (player_string 29 nodes) (player_string 30 nodes) (player_string 31 nodes) (player_string 32 nodes)) ^
-display_blank ^
-display_5  (player_string 33 nodes) (player_string 34 nodes) (player_string 35 nodes) (player_string 36 nodes) (player_string 37 nodes) ^
-display_blank ^
-display_5  (player_string 38 nodes) (player_string 39 nodes) (player_string 40 nodes) (player_string 41 nodes) (player_string 42 nodes) ^
-display_blank ^
-display_4  (player_string 43 nodes) (player_string 44 nodes) (player_string 45 nodes) (player_string 46 nodes) ^
-display_blank ^
-display_4  (player_string 47 nodes) (player_string 48 nodes) (player_string 49 nodes) (player_string 50 nodes) ^
-display_blank ^
-display_3 (player_string 51 nodes) (player_string 51 nodes) (player_string 53 nodes) ^
-display_blank ^
-display_blank
+
+let display nodes =
+  "\n"
+  ^ display_3 (player_string 0 nodes) (player_string 1 nodes)
+      (player_string 2 nodes)
+  ^ display_blank
+  ^ display_4 (player_string 3 nodes) (player_string 4 nodes)
+      (player_string 5 nodes) (player_string 6 nodes)
+  ^ display_blank
+  ^ display_4 (player_string 7 nodes) (player_string 8 nodes)
+      (player_string 9 nodes)
+      (player_string 10 nodes)
+  ^ display_blank
+  ^ display_5
+      (player_string 11 nodes)
+      (player_string 12 nodes)
+      (player_string 13 nodes)
+      (player_string 14 nodes)
+      (player_string 15 nodes)
+  ^ display_blank
+  ^ display_5
+      (player_string 16 nodes)
+      (player_string 17 nodes)
+      (player_string 18 nodes)
+      (player_string 19 nodes)
+      (player_string 20 nodes)
+  ^ display_blank
+  ^ display_mid ""
+      (player_string 21 nodes)
+      (player_string 22 nodes)
+      (player_string 23 nodes)
+      (player_string 24 nodes)
+      (player_string 25 nodes)
+      (player_string 26 nodes)
+  ^ display_blank
+  ^ display_mid ""
+      (player_string 27 nodes)
+      (player_string 28 nodes)
+      (player_string 29 nodes)
+      (player_string 30 nodes)
+      (player_string 31 nodes)
+      (player_string 32 nodes)
+  ^ display_blank
+  ^ display_5
+      (player_string 33 nodes)
+      (player_string 34 nodes)
+      (player_string 35 nodes)
+      (player_string 36 nodes)
+      (player_string 37 nodes)
+  ^ display_blank
+  ^ display_5
+      (player_string 38 nodes)
+      (player_string 39 nodes)
+      (player_string 40 nodes)
+      (player_string 41 nodes)
+      (player_string 42 nodes)
+  ^ display_blank
+  ^ display_4
+      (player_string 43 nodes)
+      (player_string 44 nodes)
+      (player_string 45 nodes)
+      (player_string 46 nodes)
+  ^ display_blank
+  ^ display_4
+      (player_string 47 nodes)
+      (player_string 48 nodes)
+      (player_string 49 nodes)
+      (player_string 50 nodes)
+  ^ display_blank
+  ^ display_3
+      (player_string 51 nodes)
+      (player_string 51 nodes)
+      (player_string 53 nodes)
+  ^ display_blank ^ display_blank
