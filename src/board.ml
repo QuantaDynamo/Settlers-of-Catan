@@ -389,7 +389,7 @@ let player_string ind nodes =
   | None -> "none"
 
 let display_3 n1 n2 n3 = display_even "" "" n1 n2 n3 "" ""
-let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n3 "" ""
+let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n4 "" ""
 let display_5 n1 n2 n3 n4 n5 = display_even "" n1 n2 n3 n4 n5 ""
 
 let display nodes =
