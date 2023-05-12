@@ -10,10 +10,32 @@ type game_state = {
   mutable current_player : int;
 }
 
+let player_one =
+  {
+    player_color = Red;
+    resources = [];
+    development_cards = [];
+    score = 0;
+    num_settlements = 0;
+    num_cities = 0;
+    num_roads = 0;
+  }
+
+let player_two =
+  {
+    player_color = Blue;
+    resources = [];
+    development_cards = [];
+    score = 0;
+    num_settlements = 0;
+    num_cities = 0;
+    num_roads = 0;
+  }
+
 let initial_game_state =
   {
     board = Board.node_list;
-    players = [ Player.player_test; Player.player_test ];
+    players = [ player_one; player_two ];
     current_player = 0;
   }
 
@@ -55,12 +77,21 @@ let rec game_loop game =
       let new_game = settle game current_player in
       game_loop new_game
   | BuildRoad ->
-      (* build_road game current_player; *)
-      game_loop game
+      failwith "Unimplemented"
+      (* let new_game = new_road game current_player in game_loop
+         new_game *)
   | PlayCard -> failwith "Unimplemented"
   | Rob -> failwith "Unimplemented"
   | Trade -> failwith "Unimplemented"
-  | EndTurn -> failwith "Unimplemented"
+  | EndTurn ->
+      let new_game =
+        {
+          game with
+          current_player =
+            (game.current_player + 1) mod List.length game.players;
+        }
+      in
+      game_loop new_game
   | CheckResources ->
       check_resources game;
       game_loop game
@@ -89,7 +120,8 @@ and start game =
     ("Hello! You are now playing Settlers of Caml-tan. The current \
       player is "
     ^ string_of_color current_player.player_color
-    ^ ".\n");
+    ^ ". Please place two settlements and two roads coming from each \
+       settlement. Then, end your turn. \n");
   Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop game in
   game_loop new_game
@@ -108,7 +140,7 @@ and roll game =
     ^ "! \n")
 
 and settle game player =
-  print_endline "Enter a number";
+  print_endline "Enter the number of the node you'd like to settle";
   let cmd_str = read_line () in
   let cmd = int_of_string cmd_str in
   let nodes = Board.node_list in
@@ -117,6 +149,7 @@ and settle game player =
     {
       current_player with
       num_settlements = current_player.num_settlements + 1;
+      score = current_player.score + 1;
     }
   in
   let updated_players =
@@ -136,9 +169,17 @@ and settle game player =
   Board.draw_board Board.tile_list b.board Board.edge_list;
   b
 
-(* and build_road game player = print_endline "Enter the index of the
-   starting node:"; let start_node_idx = read_int () in
-   player.num_cities + 1 *)
+(* let new_road game player = print_endline "Enter the number of the
+   edge where you'd like to build your road:"; let cmd_str = read_line
+   () in let cmd = int_of_string cmd_str in let current_player =
+   List.nth game.players game.current_player in let updated_player = {
+   current_player with num_roads = current_player.num_roads + 1 } in let
+   updated_players = List.mapi (fun i p -> if i = game.current_player
+   then updated_player else p) game.players in let b = { current_player
+   = game.current_player; board = build_road cmd current_player
+   game.board; players = updated_players; } in ANSITerminal.print_string
+   [ ANSITerminal.blue ] "You've successfully built a road!";
+   Board.draw_board Board.tile_list b.board Board.edge_list; b *)
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
