@@ -55,6 +55,11 @@ type board = {
   players : player list;
 }
 
+(* type board = { nodes : node list; edges : edge list; tiles : tile
+   list; intersections : intersection list; mutable roads : road list;
+   mutable cities : cities list; mutable ports : ports list; mutable
+   settlements : settlements list; players : player list; } *)
+
 let test_resource res =
   match res with
   | "Wheat" -> Wheat
@@ -308,7 +313,16 @@ let build_road ind player =
       else get_edge e.edge_id edge_list)
     edge_list
 
-let build_settlement ind player =
+(* let build_road ind player = print_endline "Please enter the node IDs
+   for the start and end of the road:"; let start_node_id = read_int ()
+   in let end_node_id = read_int () in let start_node = List.find (fun n
+   -> n.node_id = start_node_id) board.nodes in let end_node = List.find
+   (fun n -> n.node_id = end_node_id) board.nodes in let new_road = {
+   road_id = Random.int 10 + 1; start_node; end_node; owner = player;
+   is_connected = true; } in board.roads <- new_road :: board.roads;
+   print_endline "Road built successfully!" *)
+
+let build_settlement ind player board =
   List.map
     (fun n ->
       if n.node_id = ind then
@@ -321,8 +335,8 @@ let build_settlement ind player =
           has_settlement = true;
           owner = Some player;
         }
-      else get_node n.node_id node_list)
-    node_list
+      else get_node n.node_id board)
+    board
 
 let get_resource ind =
   tile_list
@@ -375,7 +389,7 @@ let player_string ind nodes =
   | None -> "none"
 
 let display_3 n1 n2 n3 = display_even "" "" n1 n2 n3 "" ""
-let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n3 "" ""
+let display_4 n1 n2 n3 n4 = display_odd "" "" n1 n2 n3 n4 "" ""
 let display_5 n1 n2 n3 n4 n5 = display_even "" n1 n2 n3 n4 n5 ""
 
 let display nodes =

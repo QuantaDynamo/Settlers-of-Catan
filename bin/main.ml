@@ -6,14 +6,41 @@ open Player
 
 type game_state = {
   board : Board.node list;
-  player : Player.player;
+  players : Player.player list;
+  mutable current_player : int;
 }
 
-let b = { board = Board.node_list; player = Player.player_test }
+let initial_game_state =
+  {
+    board = Board.node_list;
+    players = [ Player.player_test; Player.player_test ];
+    current_player = 0;
+  }
+
+let string_of_color = function
+  | Red -> "Red"
+  | Blue -> "Blue"
+  | Yellow -> "Yellow"
+  | Green -> "Green"
+  | Brown -> "Brown"
+  | White -> "White"
+
+let remove_resources (player : player) unwanted_resources : player =
+  let filtered_resources =
+    List.filter
+      (fun res -> not (List.mem res unwanted_resources))
+      player.resources
+  in
+  { player with resources = filtered_resources }
 
 let rec game_loop game =
   ignore (Sys.command "clear");
-  print_endline "What would you like to do? (start, roll, quit, settle)";
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("It's "
+    ^ string_of_color current_player.player_color
+    ^ "'s turn. What would you like to do? (start, roll, quit, settle)"
+    );
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
   match cmd with
@@ -25,7 +52,10 @@ let rec game_loop game =
       roll game;
       game_loop game
   | Settle ->
-      settle game;
+      let new_game = settle game current_player in
+      game_loop new_game
+  | BuildRoad ->
+      (* build_road game current_player; *)
       game_loop game
   | Empty ->
       empty game;
@@ -35,10 +65,12 @@ let rec game_loop game =
       game_loop game
 
 and start game =
+  let current_player = List.nth game.players game.current_player in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("Hello! You are now playing Settlers of Caml-tan. The current \
       player is "
-    ^ string_of_player player_test);
+    ^ string_of_color current_player.player_color
+    ^ ".\n");
     Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop game in
   game_loop new_game
@@ -49,21 +81,38 @@ and quit game =
 
 and roll game =
   let p, q = roll_dice () in
+  let current_player = List.nth game.players game.current_player in
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("You've rolled a " ^ string_of_int (p + q) ^ "! \n")
+    (string_of_color current_player.player_color
+    ^ " has rolled a "
+    ^ string_of_int (p + q)
+    ^ "! \n")
 
-and settle game =
+and settle game player =
   print_endline "Enter a number";
   let cmd_str = read_line () in
   let cmd = int_of_string cmd_str in
   let nodes = Board.node_list in
+  let current_player = List.nth game.players game.current_player in
   let b =
-    { board = build_settlement cmd b.player; player = b.player }
+    {
+      current_player = game.current_player;
+      board = build_settlement cmd current_player game.board;
+      players = game.players;
+    }
   in
+  current_player.num_settlements + 1;
+  (* let updated_player = remove_resources current_player [ Wood; Brick;
+     Sheep; Wheat ] in *)
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("You've successfully settled!");
-  Board.draw_board Board.tile_list b.board Board.edge_list
-  
+    ("You've successfully settled! ");
+  Board.draw_board Board.tile_list b.board Board.edge_list;
+  b.current_player <- (b.current_player + 1) mod 2;
+  b
+
+(* and build_road game player = print_endline "Enter the index of the
+   starting node:"; let start_node_idx = read_int () in
+   player.num_cities + 1 *)
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
@@ -73,10 +122,11 @@ and invalid game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Invalid command. Please try again. \n"
 
-let main () =
+let rec main () : unit =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\nWelcome to Settlers of Caml-tan. Please enter a command. \n";
   print_string "> ";
-  print_string (game_loop "")
+  ignore (game_loop initial_game_state);
+  ()
 
 let () = main ()

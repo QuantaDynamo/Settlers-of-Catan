@@ -3,7 +3,14 @@ open Gamestate
 exception Empty
 exception Invalid
 
-type command = Start | Quit | Roll | Empty | Invalid | Settle
+type command =
+  | Start
+  | Quit
+  | Roll
+  | Empty
+  | Invalid
+  | Settle
+  | BuildRoad
 
 let parse_string str =
   match String.lowercase_ascii str with
@@ -11,5 +18,6 @@ let parse_string str =
   | "quit" -> Quit
   | "roll" -> Roll
   | "settle" -> Settle
+  | "build road" -> BuildRoad
   | "" -> Empty
   | _ -> Invalid
