@@ -57,6 +57,25 @@ let rec game_loop game =
   | BuildRoad ->
       (* build_road game current_player; *)
       game_loop game
+  | PlayCard -> failwith "Unimplemented"
+  | Rob -> failwith "Unimplemented"
+  | Trade -> failwith "Unimplemented"
+  | EndTurn -> failwith "Unimplemented"
+  | CheckResources ->
+      check_resources game;
+      game_loop game
+  | CheckSettlements ->
+      check_settlements game;
+      game_loop game
+  | CheckRoads ->
+      check_roads game;
+      game_loop game
+  | CheckScore ->
+      check_score game;
+      game_loop game
+  | CheckCards ->
+      check_cards game;
+      game_loop game
   | Empty ->
       empty game;
       game_loop game
@@ -71,7 +90,7 @@ and start game =
       player is "
     ^ string_of_color current_player.player_color
     ^ ".\n");
-    Board.draw_board Board.tile_list Board.node_list Board.edge_list;
+  Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop game in
   game_loop new_game
 
@@ -94,20 +113,27 @@ and settle game player =
   let cmd = int_of_string cmd_str in
   let nodes = Board.node_list in
   let current_player = List.nth game.players game.current_player in
+  let updated_player =
+    {
+      current_player with
+      num_settlements = current_player.num_settlements + 1;
+    }
+  in
+  let updated_players =
+    List.mapi
+      (fun i p -> if i = game.current_player then updated_player else p)
+      game.players
+  in
   let b =
     {
       current_player = game.current_player;
       board = build_settlement cmd current_player game.board;
-      players = game.players;
+      players = updated_players;
     }
   in
-  current_player.num_settlements + 1;
-  (* let updated_player = remove_resources current_player [ Wood; Brick;
-     Sheep; Wheat ] in *)
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("You've successfully settled! ");
+    "You've successfully settled! ";
   Board.draw_board Board.tile_list b.board Board.edge_list;
-  b.current_player <- (b.current_player + 1) mod 2;
   b
 
 (* and build_road game player = print_endline "Enter the index of the
@@ -121,6 +147,37 @@ and empty game =
 and invalid game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Invalid command. Please try again. \n"
+
+and check_resources game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("Your resources are: "
+    ^ string_of_resources current_player.resources
+    ^ "\n")
+
+and check_settlements game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("You have "
+    ^ string_of_int current_player.num_settlements
+    ^ " settlements!  \n")
+
+and check_roads game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("You have " ^ string_of_int current_player.num_roads ^ " roads. \n")
+
+and check_score game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("Your score is:  " ^ string_of_int current_player.score ^ "\n")
+
+and check_cards game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("Your cards are:  "
+    ^ string_of_cards current_player.development_cards
+    ^ "\n")
 
 let rec main () : unit =
   ANSITerminal.print_string [ ANSITerminal.blue ]
