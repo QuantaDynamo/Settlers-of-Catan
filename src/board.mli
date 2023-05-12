@@ -40,7 +40,7 @@ val get_edge : int -> edge list -> edge
     of edges. Requires: [ind] is an integer in the range 0-71 and
     [edges] is a list of type e. *)
 
-val build_road : int -> Player.player -> edge list
+val build_road : int -> Player.player -> edge list -> edge list
 (** [build_road ind edge] returns the list of edges including the
     modified edge. Requires: [ind] is an integer in the range 0-71 and
     [edge] is of type e *)

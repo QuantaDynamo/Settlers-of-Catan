@@ -305,13 +305,13 @@ let get_tile ind tiles = List.find (fun t -> t.tile_id = ind) tiles
 let get_node ind nodes = List.find (fun n -> n.node_id = ind) nodes
 let get_edge ind edges = List.find (fun e -> e.edge_id = ind) edges
 
-let build_road ind player =
+let build_road ind player board =
   List.map
     (fun e ->
       if e.edge_id = ind then
         { edge_id = e.edge_id; has_road = true; owner = Some player }
-      else get_edge e.edge_id edge_list)
-    edge_list
+      else get_edge e.edge_id board)
+    board
 
 (* let build_road ind player = print_endline "Please enter the node IDs
    for the start and end of the road:"; let start_node_id = read_int ()
