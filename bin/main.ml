@@ -71,8 +71,7 @@ and start game =
       player is "
     ^ string_of_color current_player.player_color
     ^ ".\n");
-  let nodes = Board.node_list in
-  ANSITerminal.print_string [ ANSITerminal.blue ] (Board.display nodes);
+    Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop game in
   game_loop new_game
 
@@ -106,7 +105,8 @@ and settle game player =
   (* let updated_player = remove_resources current_player [ Wood; Brick;
      Sheep; Wheat ] in *)
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("You've successfully settled! " ^ Board.display b.board);
+    ("You've successfully settled! ");
+  Board.draw_board Board.tile_list b.board Board.edge_list;
   b.current_player <- (b.current_player + 1) mod 2;
   b
 

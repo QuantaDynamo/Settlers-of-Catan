@@ -54,3 +54,5 @@ val get_resource : int -> (int * resource) list
 (** [get_resource ind] returns the list of tiles correspodning to that
     number on the dice roll Requires: [ind] is an integer in the range
     2-12. *)
+
+val draw_board : tile list -> node list -> edge list -> unit
