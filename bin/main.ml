@@ -6,8 +6,8 @@ open Player
 
 type game_state = {
   nodes : Board.node list;
-  edges: Board.edge list;
-  tiles: Board.tile list;
+  edges : Board.edge list;
+  tiles : Board.tile list;
   players : Player.player list;
   mutable current_player : int;
 }
@@ -87,9 +87,8 @@ let rec game_loop game =
       let new_game = settle game current_player in
       game_loop new_game
   | BuildRoad ->
-      failwith "Unimplemented"
-      (* let new_game = new_road game current_player in game_loop
-         new_game *)
+      let new_game = new_road game current_player in
+      game_loop new_game
   | PlayCard -> failwith "Unimplemented"
   | Rob -> failwith "Unimplemented"
   | Trade -> failwith "Unimplemented"
@@ -180,17 +179,34 @@ and settle game player =
   Board.draw_board Board.tile_list b.nodes b.edges;
   b
 
-(* let new_road game player = print_endline "Enter the number of the
-   edge where you'd like to build your road:"; let cmd_str = read_line
-   () in let cmd = int_of_string cmd_str in let current_player =
-   List.nth game.players game.current_player in let updated_player = {
-   current_player with num_roads = current_player.num_roads + 1 } in let
-   updated_players = List.mapi (fun i p -> if i = game.current_player
-   then updated_player else p) game.players in let b = { current_player
-   = game.current_player; board = build_road cmd current_player
-   game.board; players = updated_players; } in ANSITerminal.print_string
-   [ ANSITerminal.blue ] "You've successfully built a road!";
-   Board.draw_board Board.tile_list b.board Board.edge_list; b *)
+and new_road game player =
+  print_endline
+    "Enter the number of the\n\
+    \   edge where you'd like to build your road:";
+  let cmd_str = read_line () in
+  let cmd = int_of_string cmd_str in
+  let current_player = List.nth game.players game.current_player in
+  let updated_player =
+    { current_player with num_roads = current_player.num_roads + 1 }
+  in
+  let updated_players =
+    List.mapi
+      (fun i p -> if i = game.current_player then updated_player else p)
+      game.players
+  in
+  let b =
+    {
+      nodes = game.nodes;
+      edges = build_road cmd current_player game.edges;
+      tiles = game.tiles;
+      current_player = game.current_player;
+      players = updated_players;
+    }
+  in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "You've successfully built a road!";
+  Board.draw_board Board.tile_list b.nodes b.edges;
+  b
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
