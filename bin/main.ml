@@ -39,8 +39,7 @@ and start game =
     ("Hello! You are now playing Settlers of Caml-tan. The current \
       player is "
     ^ string_of_player player_test);
-  let nodes = Board.node_list in
-  ANSITerminal.print_string [ ANSITerminal.blue ] (Board.display nodes);
+    Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop game in
   game_loop new_game
 
@@ -62,7 +61,9 @@ and settle game =
     { board = build_settlement cmd b.player; player = b.player }
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("You've successfully settled!" ^ Board.display b.board)
+    ("You've successfully settled!");
+  Board.draw_board Board.tile_list b.board Board.edge_list
+  
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
