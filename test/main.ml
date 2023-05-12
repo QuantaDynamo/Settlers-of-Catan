@@ -20,7 +20,7 @@ let get_edge_test (name : string) (ind : int) (edges : Board.edge list)
 let printer_edges = fun l -> String.concat "; " (List.map string_of_edge l)
 
 let build_road_test (name : string) (ind : int) (player : Player.player) (expected_output : Board.edge list) : test = name >:: fun _ ->
-  assert_equal expected_output (build_road ind player) ~printer:printer_edges
+  assert_equal expected_output (build_road ind player Board.edge_list) ~printer:printer_edges
 
 let printer_nodes = fun l -> String.concat "; " (List.map string_of_node l)
 let build_settlement_test (name : string) (ind : int) (player : Player.player) (expected_output : Board.node list) : test = name >:: fun _ ->
