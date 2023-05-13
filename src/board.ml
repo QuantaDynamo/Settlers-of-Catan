@@ -2,12 +2,7 @@ open Player
 open Random
 
 type resource =
-  | Wheat
-  | Sheep
-  | Brick
-  | Wood
-  | Ore
-  | Desert
+  Player.resource
 
 type settlement = { owner : player }
 type city = { owner : player }
@@ -308,7 +303,7 @@ let get_edge ind edges = List.find (fun e -> e.edge_id = ind) edges
 let build_road ind player board =
   List.map
     (fun e ->
-      if e.edge_id = ind then
+      if (e.edge_id = ind && e.owner = None) then
         { edge_id = e.edge_id; has_road = true; owner = Some player }
       else get_edge e.edge_id board)
     board
@@ -325,7 +320,7 @@ let build_road ind player board =
 let build_settlement ind player board =
   List.map
     (fun n ->
-      if n.node_id = ind then
+      if (n.node_id = ind && n.owner = None) then
         {
           node_id = n.node_id;
           adj_nodes = n.adj_nodes;

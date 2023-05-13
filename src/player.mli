@@ -1,4 +1,10 @@
-type resource
+type resource =
+  | Wheat
+  | Sheep
+  | Brick
+  | Wood
+  | Ore
+  | Desert
 
 type color =
   | Red
