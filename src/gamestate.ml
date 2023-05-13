@@ -14,19 +14,20 @@ type game_state = {
 
 let roll_dice () =
   Random.self_init ();
-  (1 + Random.int 6, 1 + Random.int 6)
+  (1 + Random.int 6, 1 + Random.int 6 + Random.int 6)
 
 let init_state =
   {
     current_player =
       {
-        player_color = Red;
+        player_color = Blue;
         resources = [];
         development_cards = [];
         score = 0;
         num_settlements = 0;
         num_cities = 0;
         num_roads = 0;
+        has_rolled = false;
       };
     game_over = false;
     dice = 0;
@@ -38,15 +39,14 @@ let init_state =
     winner = None;
   }
 
-
 let start_game =
   {
     current_player = player_test;
     game_over = false;
     dice = 2;
-    victory_points = [4; 3];
+    victory_points = [ 4; 3 ];
     dc_bank = [];
-    r_bank= [];
+    r_bank = [];
     largest_army = None;
     longest_road = None;
     winner = None;

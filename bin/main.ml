@@ -10,6 +10,7 @@ type game_state = {
   tiles : Board.tile list;
   players : Player.player list;
   mutable current_player : int;
+  mutable dice_rolled : bool;
 }
 
 let player_one =
@@ -21,6 +22,7 @@ let player_one =
     num_settlements = 0;
     num_cities = 0;
     num_roads = 0;
+    has_rolled = false;
   }
 
 let player_two =
@@ -32,15 +34,17 @@ let player_two =
     num_settlements = 0;
     num_cities = 0;
     num_roads = 0;
+    has_rolled = false;
   }
 
 let initial_game_state =
   {
-    nodes = Board.node_list;
-    edges = Board.edge_list;
-    tiles = Board.tile_list;
+    nodes = node_list;
+    edges = edge_list;
+    tiles = tile_list;
     players = [ player_one; player_two ];
     current_player = 0;
+    dice_rolled = false;
   }
 
 let string_of_color = function
@@ -71,8 +75,11 @@ let rec game_loop game =
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ("It's "
       ^ string_of_color current_player.player_color
-      ^ "'s turn. What would you like to do? (start, roll, quit, \
-         settle)");
+      ^ "'s turn.\n");
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "What would you like to do now? (roll, quit, settle, rob, trade, \
+     play card, end turn) \n\
+     >";
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
   match cmd with
@@ -81,7 +88,7 @@ let rec game_loop game =
       quit game;
       exit 0
   | Roll ->
-      roll game;
+      roll_and_process game;
       game_loop game
   | Settle ->
       let new_game = settle game current_player in
@@ -89,10 +96,11 @@ let rec game_loop game =
   | BuildRoad ->
       let new_game = new_road game current_player in
       game_loop new_game
-  | PlayCard -> failwith "Unimplemented"
+  | PlayCard -> play_card game
   | Rob -> failwith "Unimplemented"
   | Trade -> failwith "Unimplemented"
   | EndTurn ->
+      Board.draw_board Board.tile_list game.nodes game.edges;
       let new_game =
         {
           game with
@@ -123,8 +131,11 @@ let rec game_loop game =
       invalid game;
       game_loop game
 
-and start game =
-  let current_player = List.nth game.players game.current_player in
+and start initial_game_state =
+  let current_player =
+    List.nth initial_game_state.players
+      initial_game_state.current_player
+  in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("Hello! You are now playing Settlers of Caml-tan. The current \
       player is "
@@ -132,24 +143,21 @@ and start game =
     ^ ". Please place two settlements and two roads coming from each \
        settlement. Then, end your turn. \n");
   Board.draw_board Board.tile_list Board.node_list Board.edge_list;
-  let new_game = game_loop game in
-  game_loop new_game
+  let new_game = game_loop initial_game_state in
+  start new_game
 
 and quit game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Thank you for playing Settlers of Caml-tan! See you next time! \n"
 
-and roll game =
-  let p, q = roll_dice () in
-  let current_player = List.nth game.players game.current_player in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    (string_of_color current_player.player_color
-    ^ " has rolled a "
-    ^ string_of_int (p + q)
-    ^ "! \n")
+(* and roll game = let p, q = roll_dice () in let current_player =
+   List.nth game.players game.current_player in
+   ANSITerminal.print_string [ ANSITerminal.blue ] (string_of_color
+   current_player.player_color ^ " has rolled a " ^ string_of_int (p +
+   q) ^ "! \n") *)
 
 and settle game player =
-  print_endline "Enter the number of the node you'd like to settle";
+  print_endline "Enter the number of the node you'd like to settle: ";
   let cmd_str = read_line () in
   let cmd = int_of_string cmd_str in
   let current_player = List.nth game.players game.current_player in
@@ -158,6 +166,7 @@ and settle game player =
       current_player with
       num_settlements = current_player.num_settlements + 1;
       score = current_player.score + 1;
+      has_rolled = true;
     }
   in
   let updated_players =
@@ -172,22 +181,26 @@ and settle game player =
       tiles = game.tiles;
       current_player = game.current_player;
       players = updated_players;
+      dice_rolled = true;
     }
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "You've successfully settled! ";
+    "You've successfully settled!";
   Board.draw_board Board.tile_list b.nodes b.edges;
   b
 
 and new_road game player =
   print_endline
-    "Enter the number of the\n\
-    \   edge where you'd like to build your road:";
+    "Enter the number of the edge where you'd like to build your road: ";
   let cmd_str = read_line () in
   let cmd = int_of_string cmd_str in
   let current_player = List.nth game.players game.current_player in
   let updated_player =
-    { current_player with num_roads = current_player.num_roads + 1 }
+    {
+      current_player with
+      num_roads = current_player.num_roads + 1;
+      has_rolled = true;
+    }
   in
   let updated_players =
     List.mapi
@@ -201,6 +214,7 @@ and new_road game player =
       tiles = game.tiles;
       current_player = game.current_player;
       players = updated_players;
+      dice_rolled = true;
     }
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
@@ -247,11 +261,96 @@ and check_cards game =
     ^ string_of_cards current_player.development_cards
     ^ "\n")
 
-let rec main () : unit =
+and roll_and_process game =
+  let current_player = List.nth game.players game.current_player in
+  let dice_roll = roll_dice () in
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "\n\nWelcome to Settlers of Caml-tan. Please enter a command. \n";
+    (string_of_color current_player.player_color
+    ^ " has rolled a "
+    ^ string_of_int (fst dice_roll + snd dice_roll)
+    ^ "! \n");
+  let resource =
+    game.tiles
+    |> List.find (fun tiles ->
+           tiles.dice_num = fst dice_roll + snd dice_roll)
+    |> fun tiles -> tiles.resource
+  in
+  let updated_player =
+    {
+      current_player with
+      resources = resource :: current_player.resources;
+      has_rolled = true;
+    }
+  in
+  let updated_players =
+    List.mapi
+      (fun i p -> if i = game.current_player then updated_player else p)
+      game.players
+  in
+  let b =
+    {
+      nodes = game.nodes;
+      edges = game.edges;
+      tiles = game.tiles;
+      current_player = game.current_player;
+      players = updated_players;
+      dice_rolled = true;
+    }
+  in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    (string_of_color updated_player.player_color
+    ^ "'s resources are:"
+    ^ string_of_resources updated_player.resources
+    ^ "\n");
+  b
+
+and play_card game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("Your cards are:  "
+    ^ string_of_cards current_player.development_cards
+    ^ ". What would you like to play? \n");
+  let cmd_str = read_line () in
+  match cmd_str with
+  | "knight" -> failwith "unimplemented"
+  | "victory point" ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Great news! You have been awarded one victory point.";
+      let updated_player =
+        { current_player with score = current_player.score + 1 }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Your new scores is " ^ string_of_int updated_player.score);
+      Board.draw_board Board.tile_list b.nodes b.edges;
+      b
+  | "monopoly" -> failwith "unimplemented"
+  | "year of plenty" -> failwith "unimplemented"
+  | "road building" ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "You may build two roads for free. Please type 'build road' to \
+         do so.";
+      game
+  | _ -> game
+
+let rec main () : unit =
   print_string "> ";
-  ignore (game_loop initial_game_state);
+  start initial_game_state;
   ()
 
 let () = main ()

@@ -1,4 +1,12 @@
-type tile
+open Player
+
+type tile = {
+  tile_id : int;
+  resource : resource;
+  dice_num : int;
+  has_robber : bool;
+}
+
 type node
 type edge
 type settlement
@@ -7,7 +15,6 @@ type road
 type port
 type intersection
 type board
-type resource
 
 val tile_list : tile list
 val node_list : node list
