@@ -141,25 +141,25 @@ let init_node i node_list edge_list tile_list =
 
 let tile_list =
   [
-    init_tile 0 Wheat 2;
-    init_tile 1 Wheat 3;
-    init_tile 2 Wheat 3;
-    init_tile 3 Wheat 4;
-    init_tile 4 Ore 4;
-    init_tile 5 Sheep 5;
-    init_tile 6 Sheep 5;
-    init_tile 7 Sheep 6;
-    init_tile 8 Sheep 6;
-    init_tile 9 Wood 8;
-    init_tile 10 Wood 8;
-    init_tile 11 Wood 9;
-    init_tile 12 Wood 9;
-    init_tile 13 Brick 10;
-    init_tile 14 Brick 10;
-    init_tile 15 Brick 11;
-    init_tile 16 Ore 11;
-    init_tile 17 Ore 12;
-    init_tile 18 Desert 0;
+    init_tile 0 Wood 6;
+    init_tile 1 Wheat 5;
+    init_tile 2 Ore 9;
+    init_tile 3 Brick 4;
+    init_tile 4 Sheep 3;
+    init_tile 5 Brick 8;
+    init_tile 6 Ore 10;
+    init_tile 7 Ore 6;
+    init_tile 8 Sheep 5;
+    init_tile 9 Desert 0;
+    init_tile 10 Wheat 9;
+    init_tile 11 Sheep 12;
+    init_tile 12 Brick 3;
+    init_tile 13 Wood 2;
+    init_tile 14 Wheat 10;
+    init_tile 15 Wood 11;
+    init_tile 16 Wheat 11;
+    init_tile 17 Wood 4;
+    init_tile 18 Sheep 8;
   ]
 
 let edge_list =
