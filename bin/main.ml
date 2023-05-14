@@ -80,14 +80,15 @@ let rec game_loop game =
       ^ string_of_color current_player.player_color
       ^ " has won the game!\n")
   else
+    Board.draw_board game.tiles game.nodes game.edges;
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ("It's "
       ^ string_of_color current_player.player_color
       ^ "'s turn.\n");
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    "What would you like to do now? (roll, quit, settle, rob, trade, \
-     play card, end turn, buy card) \n\
-     >";
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "What would you like to do now? (roll, quit, settle, rob, trade, \
+      play card, end turn, buy card) \n\
+      >";
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
   match cmd with
@@ -108,7 +109,6 @@ let rec game_loop game =
   | Rob -> failwith "Unimplemented"
   | Trade -> failwith "Unimplemented"
   | EndTurn ->
-      Board.draw_board Board.tile_list game.nodes game.edges;
       let new_game =
         {
           game with
@@ -153,7 +153,6 @@ and start initial_game_state =
     ^ string_of_color current_player.player_color
     ^ ". Please place two settlements and two roads coming from each \
        settlement. Then, end your turn. \n");
-  Board.draw_board Board.tile_list Board.node_list Board.edge_list;
   let new_game = game_loop initial_game_state in
   start new_game
 
@@ -197,7 +196,6 @@ and settle game player =
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "You've successfully settled!";
-  Board.draw_board Board.tile_list b.nodes b.edges;
   b
 
 and new_road game player =
@@ -230,7 +228,6 @@ and new_road game player =
   in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "You've successfully built a road!";
-  Board.draw_board Board.tile_list b.nodes b.edges;
   b
 
 and empty game =
