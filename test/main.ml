@@ -256,7 +256,7 @@ let board_tests =
       (List.nth node_test 38);
     get_node_test "Check node of index 39" 39 node_test
       (List.nth node_test 39);
-    get_node_test "Check node of index 40" 40 node_test 
+    get_node_test "Check node of index 40" 40 node_test
       (List.nth node_test 40);
     get_node_test "Check node of index 41" 41 node_test
       (List.nth node_test 41);
@@ -456,7 +456,5 @@ let board_tests =
     draw_test "Check" Board.tile_list Board.node_list Board.edge_list ();
   ]
 
-let suite =
-  "test suite for game" >::: List.flatten [ board_tests ]
-
+let suite = "test suite for game" >::: List.flatten [ board_tests ]
 let _ = run_test_tt_main suite

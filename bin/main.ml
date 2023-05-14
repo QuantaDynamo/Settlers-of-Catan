@@ -71,6 +71,18 @@ let remove_resource (resources : resource list) (res : resource) :
   in
   remove [] resources
 
+let remove_card
+    (player : player)
+    (cards : development_card list)
+    (card_to_remove : development_card) : development_card list =
+  let rec remove acc = function
+    | [] -> acc
+    | c :: rest ->
+        if c = card_to_remove then remove acc rest
+        else remove (c :: acc) rest
+  in
+  remove [] cards
+
 let rec game_loop game =
   ignore (Sys.command "clear");
   let current_player = List.nth game.players game.current_player in
@@ -79,16 +91,15 @@ let rec game_loop game =
       ("Congratulations, "
       ^ string_of_color current_player.player_color
       ^ " has won the game!\n")
-  else
-    Board.draw_board game.tiles game.nodes game.edges;
-    ANSITerminal.print_string [ ANSITerminal.blue ]
-      ("It's "
-      ^ string_of_color current_player.player_color
-      ^ "'s turn.\n");
-    ANSITerminal.print_string [ ANSITerminal.blue ]
-      "What would you like to do now? (roll, quit, settle, rob, trade, \
-      play card, end turn, buy card) \n\
-      >";
+  else Board.draw_board game.tiles game.nodes game.edges;
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("It's "
+    ^ string_of_color current_player.player_color
+    ^ "'s turn.\n");
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "What would you like to do now? (roll, quit, settle, rob, trade, \
+     play card, end turn, buy card) \n\
+     >";
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
   match cmd with
@@ -335,7 +346,8 @@ and roll_and_process game =
     in
     let updated_players =
       List.mapi
-        (fun i p -> if i = game.current_player then updated_player else p)
+        (fun i p ->
+          if i = game.current_player then updated_player else p)
         game.players
     in
     let b =
@@ -353,7 +365,7 @@ and roll_and_process game =
       ^ "'s resources are:"
       ^ string_of_resources updated_player.resources
       ^ "\n");
-    b
+    b)
   else game
 
 and play_card game =
@@ -372,7 +384,13 @@ and play_card game =
   | "knight" -> failwith "unimplemented"
   | "victory point" ->
       let updated_player =
-        { current_player with score = current_player.score + 1 }
+        {
+          current_player with
+          score = current_player.score + 1;
+          development_cards =
+            remove_card current_player current_player.development_cards
+              (card_of_string "victory point");
+        }
       in
       let updated_players =
         List.mapi
@@ -410,6 +428,9 @@ and play_card game =
                 if p = current_player then res :: acc
                 else remove_resource p.resources res)
               current_player.resources game.players;
+          development_cards =
+            remove_card current_player current_player.development_cards
+              (card_of_string "monopoly");
         }
       in
       let updated_players =
@@ -448,6 +469,9 @@ and play_card game =
         {
           current_player with
           resources = res_one :: res_two :: current_player.resources;
+          development_cards =
+            remove_card current_player current_player.development_cards
+              (card_of_string "year of plenty");
         }
       in
       let updated_players =
@@ -474,15 +498,40 @@ and play_card game =
         ^ ".");
       b
   | "road building" ->
+      let current_player = List.nth game.players game.current_player in
+      let updated_player =
+        {
+          current_player with
+          development_cards =
+            remove_card current_player current_player.development_cards
+              (card_of_string "road building");
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
       ANSITerminal.print_string [ ANSITerminal.blue ]
         "You may build two roads for free. Please type 'build road' to \
          do so.";
-      game
+      b
   | _ -> game
 
 let rec main () : unit =
   print_string "> ";
-  ignore(start initial_game_state);
+  ignore (start initial_game_state);
   ()
 
 let () = main ()
