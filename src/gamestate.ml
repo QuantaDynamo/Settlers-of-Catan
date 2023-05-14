@@ -14,7 +14,7 @@ type game_state = {
 
 let roll_dice () =
   Random.self_init ();
-  (1 + Random.int 6, 1 + Random.int 6 + Random.int 6)
+  Random.int 12 + 1
 
 let init_state =
   {
