@@ -365,7 +365,7 @@ and roll_and_process game =
       ^ "'s resources are:"
       ^ string_of_resources updated_player.resources
       ^ "\n");
-    b)
+    b;
   else game
 
 and play_card game =
