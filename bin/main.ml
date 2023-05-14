@@ -63,6 +63,14 @@ let remove_resources (player : player) unwanted_resources : player =
   in
   { player with resources = filtered_resources }
 
+let remove_resource (resources : resource list) (res : resource) :
+    resource list =
+  let rec remove acc = function
+    | [] -> acc
+    | r :: rs -> if r = res then remove acc rs else remove (r :: acc) rs
+  in
+  remove [] resources
+
 let rec game_loop game =
   ignore (Sys.command "clear");
   let current_player = List.nth game.players game.current_player in
@@ -314,8 +322,6 @@ and play_card game =
   match cmd_str with
   | "knight" -> failwith "unimplemented"
   | "victory point" ->
-      ANSITerminal.print_string [ ANSITerminal.blue ]
-        "Great news! You have been awarded one victory point.";
       let updated_player =
         { current_player with score = current_player.score + 1 }
       in
@@ -336,11 +342,88 @@ and play_card game =
         }
       in
       ANSITerminal.print_string [ ANSITerminal.blue ]
-        ("Your new scores is " ^ string_of_int updated_player.score);
-      Board.draw_board Board.tile_list b.nodes b.edges;
+        "Great news! You have been awarded one victory point.";
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Your new score is " ^ string_of_int updated_player.score ^ "!");
       b
-  | "monopoly" -> failwith "unimplemented"
-  | "year of plenty" -> failwith "unimplemented"
+  | "monopoly" ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Please choose a resource type to monopolize.";
+      let resource_type = read_line () in
+      let res = resource_of_string resource_type in
+      let current_player = List.nth game.players game.current_player in
+      let updated_player =
+        {
+          current_player with
+          resources =
+            List.fold_left
+              (fun acc p ->
+                if p = current_player then acc
+                else remove_resource p.resources res @ acc)
+              current_player.resources game.players;
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("You have monopolized " ^ string_of_resource res
+       ^ " from all other players.");
+      b
+  | "year of plenty" ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Please choose the first resource of your choice to add to \
+         your resource bank.";
+      let resource_one = read_line () in
+      let res_one = resource_of_string resource_one in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Please choose the second resource of your choice to add to \
+         your resource bank.";
+      let resource_two = read_line () in
+      let res_two = resource_of_string resource_two in
+      let current_player = List.nth game.players game.current_player in
+      let updated_player =
+        {
+          current_player with
+          resources = res_one :: res_two :: current_player.resources;
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Great news! You have been awarded a "
+        ^ string_of_resource res_one
+        ^ " and a "
+        ^ string_of_resource res_two
+        ^ ".");
+      b
   | "road building" ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
         "You may build two roads for free. Please type 'build road' to \

@@ -72,6 +72,16 @@ let string_of_resource res =
   | Wood -> "Wood"
   | Ore -> "Ore"
 
+let resource_of_string str =
+  match String.lowercase_ascii str with
+  | "wheat" -> Wheat
+  | "desert" -> Desert
+  | "sheep" -> Sheep
+  | "brick" -> Brick
+  | "wood" -> Wood
+  | "ore" -> Ore
+  | _ -> failwith "Invalid resource string"
+
 let string_of_card res =
   match res with
   | Knight -> "Knight"
