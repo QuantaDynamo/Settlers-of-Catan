@@ -328,16 +328,19 @@ and roll_and_process game =
   let dice_roll = roll_dice () in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     (string_of_color current_player.player_color
-    ^ " has rolled a " ^ string_of_int dice_roll ^ "! \n");
-  if dice_roll <> 7 && dice_roll <> 1 then (
-    let resource =
-      game.tiles |> List.find (fun tiles -> tiles.dice_num = dice_roll)
-      |> fun tiles -> tiles.resource
-    in
+    ^ " has rolled a "
+    ^ string_of_int dice_roll
+    ^ "! \n");
+  if dice_roll <> 7 && dice_roll <> 1 then
+    let new_resources = 
+      game.tiles
+      |> List.filter (fun tiles -> tiles.dice_num = dice_roll)
+      |> List.map (fun tiles -> tiles.resource)
+    in 
     let updated_player =
       {
         current_player with
-        resources = resource :: current_player.resources;
+        resources = new_resources @ current_player.resources;
         has_rolled = true;
       }
     in
@@ -362,7 +365,7 @@ and roll_and_process game =
       ^ "'s resources are:"
       ^ string_of_resources updated_player.resources
       ^ "\n");
-    b)
+    b;
   else game
 
 and play_card game =
