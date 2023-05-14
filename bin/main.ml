@@ -416,15 +416,23 @@ and play_card game =
       let resource_type = read_line () in
       let res = resource_of_string resource_type in
       let current_player = List.nth game.players game.current_player in
+      let monopolized_resources =
+        List.fold_left
+          (fun acc p ->
+            if p = current_player then acc
+            else
+              let resources = remove_resource p.resources res in
+              let num_removed =
+                List.length p.resources - List.length resources
+              in
+              List.append (List.init num_removed (fun _ -> res)) acc)
+          [] game.players
+      in
       let updated_player =
         {
           current_player with
           resources =
-            List.fold_left
-              (fun acc p ->
-                if p = current_player then res :: acc
-                else remove_resource p.resources res)
-              current_player.resources game.players;
+            List.append monopolized_resources current_player.resources;
           development_cards =
             remove_card current_player current_player.development_cards
               (card_of_string "monopoly");
