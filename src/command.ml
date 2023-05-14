@@ -20,6 +20,7 @@ type command =
   | CheckRoads
   | CheckScore
   | CheckCards
+  | BuyCard
 
 let parse_string str =
   match String.lowercase_ascii str with
@@ -37,5 +38,6 @@ let parse_string str =
   | "check roads" -> CheckRoads
   | "check score" -> CheckScore
   | "check cards" -> CheckCards
+  | "buy card" -> BuyCard
   | "" -> Empty
   | _ -> Invalid

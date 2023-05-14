@@ -80,7 +80,7 @@ let resource_of_string str =
   | "brick" -> Brick
   | "wood" -> Wood
   | "ore" -> Ore
-  | _ -> failwith "Invalid resource string"
+  | _ -> raise (Invalid_argument "Invalid resource")
 
 let string_of_card res =
   match res with
@@ -89,6 +89,16 @@ let string_of_card res =
   | Monopoly -> "Monopoly"
   | YearofPlenty -> "YearofPlenty"
   | RoadBuilding -> "RoadBuilding"
+  | _ -> raise (Invalid_argument "Invalid development card")
+
+let card_of_string str =
+  match String.lowercase_ascii str with
+  | "knight" -> Knight
+  | "victory point" -> VictoryPoint
+  | "monopoly" -> Monopoly
+  | "year of plenty" -> YearofPlenty
+  | "road building" -> RoadBuilding
+  | _ -> raise (Invalid_argument "Invalid card development card")
 
 let string_of_resources l =
   String.concat "; " (List.map string_of_resource l)

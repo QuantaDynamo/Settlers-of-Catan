@@ -86,7 +86,7 @@ let rec game_loop game =
       ^ "'s turn.\n");
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "What would you like to do now? (roll, quit, settle, rob, trade, \
-     play card, end turn) \n\
+     play card, end turn, buy card) \n\
      >";
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
@@ -132,6 +132,9 @@ let rec game_loop game =
   | CheckCards ->
       check_cards game;
       game_loop game
+  | BuyCard ->
+      let new_game = buy_card game in
+      game_loop new_game
   | Empty ->
       empty game;
       game_loop game
@@ -269,6 +272,49 @@ and check_cards game =
     ^ string_of_cards current_player.development_cards
     ^ "\n")
 
+and buy_card game =
+  let current_player = List.nth game.players game.current_player in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "What card would you like to buy? \n";
+  let card = read_line () in
+  let add_card = card_of_string card in
+  let updated_player =
+    {
+      current_player with
+      development_cards = add_card :: current_player.development_cards;
+    }
+  in
+  let updated_players =
+    List.mapi
+      (fun i p -> if i = game.current_player then updated_player else p)
+      (game.players
+      |> List.map (fun p ->
+             {
+               p with
+               development_cards =
+                 List.filter
+                   (fun c -> c <> add_card)
+                   p.development_cards;
+             }))
+  in
+  let b =
+    {
+      nodes = game.nodes;
+      edges = game.edges;
+      tiles = game.tiles;
+      current_player = game.current_player;
+      players = updated_players;
+      dice_rolled = true;
+    }
+  in
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    ("Congrats! "
+    ^ string_of_color updated_player.player_color
+    ^ " has bought " ^ card ^ ". Their development cards are: "
+    ^ string_of_cards updated_player.development_cards
+    ^ "\n");
+  b
+
 and roll_and_process game =
   let current_player = List.nth game.players game.current_player in
   let dice_roll = roll_dice () in
@@ -314,10 +360,15 @@ and roll_and_process game =
 
 and play_card game =
   let current_player = List.nth game.players game.current_player in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("Your cards are:  "
-    ^ string_of_cards current_player.development_cards
-    ^ ". What would you like to play? \n");
+  if current_player.development_cards == [] then
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "I'm sorry. You don't have any development cards to play. Please \
+       try a different command."
+  else
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      ("Your cards are:  "
+      ^ string_of_cards current_player.development_cards
+      ^ ". What would you like to play? \n");
   let cmd_str = read_line () in
   match cmd_str with
   | "knight" -> failwith "unimplemented"
@@ -358,8 +409,8 @@ and play_card game =
           resources =
             List.fold_left
               (fun acc p ->
-                if p = current_player then acc
-                else remove_resource p.resources res @ acc)
+                if p = current_player then res :: acc
+                else remove_resource p.resources res)
               current_player.resources game.players;
         }
       in
