@@ -321,16 +321,15 @@ and roll_and_process game =
     ^ string_of_int dice_roll
     ^ "! \n");
   if dice_roll <> 7 && dice_roll <> 1 then
-    let resource =
+    let new_resources = 
       game.tiles
-      |> List.find (fun tiles ->
-            tiles.dice_num = dice_roll)
-      |> fun tiles -> tiles.resource
-    in
+      |> List.filter (fun tiles -> tiles.dice_num = dice_roll)
+      |> List.map (fun tiles -> tiles.resource)
+    in 
     let updated_player =
       {
         current_player with
-        resources = resource :: current_player.resources;
+        resources = new_resources @ current_player.resources;
         has_rolled = true;
       }
     in
