@@ -321,42 +321,44 @@ and roll_and_process game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     (string_of_color current_player.player_color
     ^ " has rolled a "
-    ^ string_of_int (fst dice_roll + snd dice_roll)
+    ^ string_of_int dice_roll
     ^ "! \n");
-  let resource =
-    game.tiles
-    |> List.find (fun tiles ->
-           tiles.dice_num = fst dice_roll + snd dice_roll)
-    |> fun tiles -> tiles.resource
-  in
-  let updated_player =
-    {
-      current_player with
-      resources = resource :: current_player.resources;
-      has_rolled = true;
-    }
-  in
-  let updated_players =
-    List.mapi
-      (fun i p -> if i = game.current_player then updated_player else p)
-      game.players
-  in
-  let b =
-    {
-      nodes = game.nodes;
-      edges = game.edges;
-      tiles = game.tiles;
-      current_player = game.current_player;
-      players = updated_players;
-      dice_rolled = true;
-    }
-  in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    (string_of_color updated_player.player_color
-    ^ "'s resources are:"
-    ^ string_of_resources updated_player.resources
-    ^ "\n");
-  b
+  if dice_roll <> 7 && dice_roll <> 1 then
+    let resource =
+      game.tiles
+      |> List.find (fun tiles ->
+            tiles.dice_num = dice_roll)
+      |> fun tiles -> tiles.resource
+    in
+    let updated_player =
+      {
+        current_player with
+        resources = resource :: current_player.resources;
+        has_rolled = true;
+      }
+    in
+    let updated_players =
+      List.mapi
+        (fun i p -> if i = game.current_player then updated_player else p)
+        game.players
+    in
+    let b =
+      {
+        nodes = game.nodes;
+        edges = game.edges;
+        tiles = game.tiles;
+        current_player = game.current_player;
+        players = updated_players;
+        dice_rolled = true;
+      }
+    in
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      (string_of_color updated_player.player_color
+      ^ "'s resources are:"
+      ^ string_of_resources updated_player.resources
+      ^ "\n");
+    b
+  else game
 
 and play_card game =
   let current_player = List.nth game.players game.current_player in
@@ -484,7 +486,7 @@ and play_card game =
 
 let rec main () : unit =
   print_string "> ";
-  start initial_game_state;
+  ignore(start initial_game_state);
   ()
 
 let () = main ()
