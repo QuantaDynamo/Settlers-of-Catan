@@ -96,8 +96,8 @@ let rec game_loop game =
       quit game;
       exit 0
   | Roll ->
-      roll_and_process game;
-      game_loop game
+      let new_game = roll_and_process game in
+      game_loop new_game
   | Settle ->
       let new_game = settle game current_player in
       game_loop new_game
