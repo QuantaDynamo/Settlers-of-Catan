@@ -156,7 +156,7 @@ let tile_list =
     init_tile 15 Wood 11;
     init_tile 16 Wheat 11;
     init_tile 17 Wood 4;
-    init_tile 18 Sheep 8;
+    init_tile 18 Sheep 7;
   ]
 
 let edge_list =
