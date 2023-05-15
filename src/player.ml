@@ -1,3 +1,5 @@
+exception Invalid_card
+
 type resource =
   | Wheat
   | Sheep

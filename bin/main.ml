@@ -316,57 +316,64 @@ and buy_card game =
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "What card would you like to buy? (monopoly, year of plenty, \
        victory point, or road building) \n";
-    let card = read_line () in
-    let add_card = card_of_string card in
-    let updated_resources =
-      remove_first_instances [ Wheat; Ore; Sheep ]
-        current_player.resources
-    in
-    let updated_player =
-      {
-        current_player with
-        development_cards = add_card :: current_player.development_cards;
-        resources = updated_resources;
-      }
-    in
-    let updated_players =
-      List.mapi
-        (fun i p ->
-          if i = game.current_player then updated_player else p)
-        (game.players
-        |> List.map (fun p ->
-               {
-                 p with
-                 development_cards =
-                   (if p = current_player then
-                    add_card :: p.development_cards
-                   else
-                     List.filter
-                       (fun c -> c <> add_card)
-                       p.development_cards);
-                 resources =
-                   (if p = current_player then
-                    remove_one_resource p [ Wheat ]
-                   else p.resources);
-               }))
-    in
-    let b =
-      {
-        nodes = game.nodes;
-        edges = game.edges;
-        tiles = game.tiles;
-        current_player = game.current_player;
-        players = updated_players;
-        dice_rolled = true;
-      }
-    in
-    ANSITerminal.print_string [ ANSITerminal.blue ]
-      ("Congrats! "
-      ^ string_of_color updated_player.player_color
-      ^ " has bought " ^ card ^ ". Their development cards are: "
-      ^ string_of_cards updated_player.development_cards
-      ^ "\n");
-    b)
+    try
+      let card = read_line () in
+      let add_card = card_of_string card in
+      let updated_resources =
+        remove_first_instances [ Wheat; Ore; Sheep ]
+          current_player.resources
+      in
+      let updated_player =
+        {
+          current_player with
+          development_cards =
+            add_card :: current_player.development_cards;
+          resources = updated_resources;
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          (game.players
+          |> List.map (fun p ->
+                 {
+                   p with
+                   development_cards =
+                     (if p = current_player then
+                      add_card :: p.development_cards
+                     else
+                       List.filter
+                         (fun c -> c <> add_card)
+                         p.development_cards);
+                   resources =
+                     (if p = current_player then
+                      remove_one_resource p [ Wheat ]
+                     else p.resources);
+                 }))
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Congrats! "
+        ^ string_of_color updated_player.player_color
+        ^ " has bought " ^ card ^ ". Their development cards are: "
+        ^ string_of_cards updated_player.development_cards
+        ^ "\n");
+      b
+    with _ ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Sorry, that's an invalid card name. Please try a different \
+         command.\n";
+      game)
 
 and roll_and_process game =
   let current_player = List.nth game.players game.current_player in
