@@ -314,7 +314,8 @@ and buy_card game =
     game)
   else (
     ANSITerminal.print_string [ ANSITerminal.blue ]
-      "What card would you like to buy? \n";
+      "What card would you like to buy? (monopoly, year of plenty, \
+       victory point, or road building) \n";
     let card = read_line () in
     let add_card = card_of_string card in
     let updated_resources =
