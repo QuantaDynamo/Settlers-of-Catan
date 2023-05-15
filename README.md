@@ -32,7 +32,7 @@ At the start of every turn, a player should roll the dice. The dice roll corresp
 
 **Development Cards:**
 
-A player must have a sheep, wheat, and ore in their resources to buy a development card. Once they buy a development card, it will appear in their development_card list. Additionally, once a development card is bought, one of each of the above resources will be removed from their resources. To buy a card, a player should type buy card; to play a card, a player should type **play card**.
+A player must have a sheep, wheat, and ore in their resources to buy a development card. Once they buy a development card, it will appear in their development_card list; a Victory Point will also be added to their score. Additionally, once a development card is bought, one of each of the above resources will be removed from their resources. To buy a card, a player should type buy card; to play a card, a player should type **play card**.
 The cards that can be purchased or played are as follows: monopoly, year of plenty, road building, and victory point.  Once a card is played, it will disappear from their development_card list. 
 
 *NOTE: A player must type in the correct command (monopoly, year of plenty, victory point, road building) when prompted which card they’d like to play or buy*
