@@ -329,6 +329,7 @@ and buy_card game =
           development_cards =
             add_card :: current_player.development_cards;
           resources = updated_resources;
+          score = current_player.score + 1;
         }
       in
       let updated_players =
