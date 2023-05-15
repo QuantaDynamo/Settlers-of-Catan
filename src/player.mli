@@ -25,6 +25,7 @@ type player = {
   num_cities : int;
   num_roads : int;
   mutable has_rolled : bool;
+  mutable played_card : bool;
 }
 
 val player_test : player

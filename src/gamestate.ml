@@ -28,6 +28,7 @@ let init_state =
         num_cities = 0;
         num_roads = 0;
         has_rolled = false;
+        played_card = false;
       };
     game_over = false;
     dice = 0;

@@ -39,6 +39,7 @@ type player = {
   num_cities : int;
   num_roads : int;
   mutable has_rolled : bool;
+  mutable played_card : bool;
 }
 
 let player_test =
@@ -51,6 +52,7 @@ let player_test =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
+    played_card = false;
   }
 
 let string_color col =

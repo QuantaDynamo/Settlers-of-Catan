@@ -1,19 +1,16 @@
-(* Test Plan:
-   The Board and Command modules are manually tested here.
+(* Test Plan: The Board and Command modules are manually tested here.
    The other modules-- Gamestate, and Player-- are not tested
-  automatically since they are mostly used in the terminal,
-  or are helper type_to_string functions for other functions which
-  we do test. Instead, we throughly test the Commamand and Board
-  modules. First, we used black box testing and test-driven development
-  while implementing the Board module. This meant testing
-  all the getters and setters for the nodes, edges, and tiles, 
-  as well as getting resources. For the command file, we also tested
-  the parse_string file, to make sure commands correctly route to 
-  right commands for the game loop. After that, we used Bisect to
-  make sure we were'nt undertesting Board and Command. Command has
-  100% coverage and Board is at 97%, with the only functions not being
-  covered being string helper functions.
-   *)
+   automatically since they are mostly used in the terminal, or are
+   helper type_to_string functions for other functions which we do test.
+   Instead, we throughly test the Commamand and Board modules. First, we
+   used black box testing and test-driven development while implementing
+   the Board module. This meant testing all the getters and setters for
+   the nodes, edges, and tiles, as well as getting resources. For the
+   command file, we also tested the parse_string file, to make sure
+   commands correctly route to right commands for the game loop. After
+   that, we used Bisect to make sure we were'nt undertesting Board and
+   Command. Command has 100% coverage and Board is at 97%, with the only
+   functions not being covered being string helper functions. *)
 
 open OUnit2
 open Catan
@@ -115,6 +112,7 @@ let player_red =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
+    played_card = false;
   }
 
 let player_blue =
@@ -127,6 +125,7 @@ let player_blue =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
+    played_card = false;
   }
 
 let tile_test = tile_list
@@ -474,40 +473,47 @@ let board_tests =
     draw_test "Check" Board.tile_list Board.node_list Board.edge_list ();
   ]
 
-  let string_of_command cmd =
-    match cmd with
-    | Empty -> "empty"
-    | BuyCard -> "buy card"
-    | CheckCards -> "check cards"
-    | CheckScore -> "check score"
-    | CheckRoads -> "check roads"
-    | CheckSettlements -> "check settlements"
-    | CheckResources -> "check resources"
-    | EndTurn -> "end turn"
-    | PlayCard -> "play card"
-    | BuildRoad -> "build road"
-    | Settle -> "settle"
-    | Roll -> "roll"
-    | Quit -> "quit"
-    | Start -> "start"
-    | Invalid -> "invalid"
+let string_of_command cmd =
+  match cmd with
+  | Empty -> "empty"
+  | BuyCard -> "buy card"
+  | CheckCards -> "check cards"
+  | CheckScore -> "check score"
+  | CheckRoads -> "check roads"
+  | CheckSettlements -> "check settlements"
+  | CheckResources -> "check resources"
+  | EndTurn -> "end turn"
+  | PlayCard -> "play card"
+  | BuildRoad -> "build road"
+  | Settle -> "settle"
+  | Roll -> "roll"
+  | Quit -> "quit"
+  | Start -> "start"
+  | Invalid -> "invalid"
 
 let parse_string_test
     (name : string)
     (input : string)
     (expected_output : Command.command) : test =
-  name >:: fun _ -> assert_equal expected_output (parse_string input) ~printer:string_of_command
+  name >:: fun _ ->
+  assert_equal expected_output (parse_string input)
+    ~printer:string_of_command
 
 let command_tests =
   [
     parse_string_test "Check Start command" "start" Start;
     parse_string_test "Check Empty command" "" Empty;
     parse_string_test "Check BuyCard command" "buy card" BuyCard;
-    parse_string_test "Check CheckCards command" "check cards" CheckCards;
-    parse_string_test "Check CheckScore command" "check score" CheckScore;
-    parse_string_test "Check CheckRoads command" "check roads" CheckRoads;
-    parse_string_test "Check CheckSettlements command" "check settlements" CheckSettlements;
-    parse_string_test "Check CheckResources command" "check resources" CheckResources;
+    parse_string_test "Check CheckCards command" "check cards"
+      CheckCards;
+    parse_string_test "Check CheckScore command" "check score"
+      CheckScore;
+    parse_string_test "Check CheckRoads command" "check roads"
+      CheckRoads;
+    parse_string_test "Check CheckSettlements command"
+      "check settlements" CheckSettlements;
+    parse_string_test "Check CheckResources command" "check resources"
+      CheckResources;
     parse_string_test "Check EndTurn command" "end turn" EndTurn;
     parse_string_test "Check PlayCard command" "play card" PlayCard;
     parse_string_test "Check BuildRoad command" "build road" BuildRoad;
@@ -517,5 +523,7 @@ let command_tests =
     parse_string_test "Check Invalid command" "sdfjos" Invalid;
   ]
 
-let suite = "test suite for game" >::: List.flatten [ board_tests; command_tests; ]
+let suite =
+  "test suite for game" >::: List.flatten [ board_tests; command_tests ]
+
 let _ = run_test_tt_main suite

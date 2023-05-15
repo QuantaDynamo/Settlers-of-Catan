@@ -23,6 +23,7 @@ let player_one =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
+    played_card = false;
   }
 
 let player_two =
@@ -35,6 +36,7 @@ let player_two =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
+    played_card = false;
   }
 
 let initial_game_state =
@@ -422,6 +424,10 @@ and play_card game =
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "I'm sorry. You don't have any development cards to play. Please \
        try a different command."
+  else if current_player.played_card then
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "You have already played a development card in this turn. Please \
+       press enter."
   else
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ("Your cards are:  "
@@ -437,6 +443,7 @@ and play_card game =
           development_cards =
             remove_card current_player current_player.development_cards
               (card_of_string "victory point");
+          played_card = true;
         }
       in
       let updated_players =
@@ -491,6 +498,7 @@ and play_card game =
           development_cards =
             remove_card current_player current_player.development_cards
               (card_of_string "monopoly");
+          played_card = true;
         }
       in
       let updated_players =
@@ -532,6 +540,7 @@ and play_card game =
           development_cards =
             remove_card current_player current_player.development_cards
               (card_of_string "year of plenty");
+          played_card = true;
         }
       in
       let updated_players =
@@ -567,6 +576,7 @@ and play_card game =
               (card_of_string "road building");
           resources =
             Wood :: Wood :: Brick :: Brick :: current_player.resources;
+          played_card = true;
         }
       in
       let updated_players =
