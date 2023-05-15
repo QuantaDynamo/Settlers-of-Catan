@@ -55,13 +55,12 @@ let string_of_color = function
   | Brown -> "Brown"
   | White -> "White"
 
-let remove_resources (player : player) unwanted_resources : player =
-  let filtered_resources =
-    List.filter
-      (fun res -> not (List.mem res unwanted_resources))
-      player.resources
-  in
-  { player with resources = filtered_resources }
+let remove_one_resource
+    (player : player)
+    (unwanted_resources : resource list) : resource list =
+  List.filter
+    (fun res -> not (List.mem res unwanted_resources))
+    player.resources
 
 let remove_resource (resources : resource list) (res : resource) :
     resource list =
@@ -282,61 +281,68 @@ and check_cards game =
 
 and buy_card game =
   let current_player = List.nth game.players game.current_player in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    "What card would you like to buy? \n";
-  let card = read_line () in
-  let add_card = card_of_string card in
-  let updated_player =
-    {
-      current_player with
-      development_cards = add_card :: current_player.development_cards;
-    }
-  in
-  let updated_players =
-    List.mapi
-      (fun i p -> if i = game.current_player then updated_player else p)
-      (game.players
-      |> List.map (fun p ->
-             {
-               p with
-               development_cards =
-                 List.filter
-                   (fun c -> c <> add_card)
-                   p.development_cards;
-             }))
-  in
-  let b =
-    {
-      nodes = game.nodes;
-      edges = game.edges;
-      tiles = game.tiles;
-      current_player = game.current_player;
-      players = updated_players;
-      dice_rolled = true;
-    }
-  in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("Congrats! "
-    ^ string_of_color updated_player.player_color
-    ^ " has bought " ^ card ^ ". Their development cards are: "
-    ^ string_of_cards updated_player.development_cards
-    ^ "\n");
-  b
+  if not (List.mem Wheat current_player.resources) then (
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "I'm sorry. You don't have enough resources to buy a card. \
+       Please try a different command.";
+    game)
+  else (
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "What card would you like to buy? \n";
+    let card = read_line () in
+    let add_card = card_of_string card in
+    let updated_player =
+      {
+        current_player with
+        development_cards = add_card :: current_player.development_cards;
+      }
+    in
+    let updated_players =
+      List.mapi
+        (fun i p ->
+          if i = game.current_player then updated_player else p)
+        (game.players
+        |> List.map (fun p ->
+               {
+                 p with
+                 development_cards =
+                   List.filter
+                     (fun c -> c <> add_card)
+                     p.development_cards;
+                 resources =
+                   remove_one_resource current_player [ Wheat ];
+               }))
+    in
+    let b =
+      {
+        nodes = game.nodes;
+        edges = game.edges;
+        tiles = game.tiles;
+        current_player = game.current_player;
+        players = updated_players;
+        dice_rolled = true;
+      }
+    in
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      ("Congrats! "
+      ^ string_of_color updated_player.player_color
+      ^ " has bought " ^ card ^ ". Their development cards are: "
+      ^ string_of_cards updated_player.development_cards
+      ^ "\n");
+    b)
 
 and roll_and_process game =
   let current_player = List.nth game.players game.current_player in
   let dice_roll = roll_dice () in
   ANSITerminal.print_string [ ANSITerminal.blue ]
     (string_of_color current_player.player_color
-    ^ " has rolled a "
-    ^ string_of_int dice_roll
-    ^ "! \n");
-  if dice_roll <> 7 && dice_roll <> 1 then
-    let new_resources = 
+    ^ " has rolled a " ^ string_of_int dice_roll ^ "! \n");
+  if dice_roll <> 7 && dice_roll <> 1 then (
+    let new_resources =
       game.tiles
       |> List.filter (fun tiles -> tiles.dice_num = dice_roll)
       |> List.map (fun tiles -> tiles.resource)
-    in 
+    in
     let updated_player =
       {
         current_player with
@@ -365,8 +371,12 @@ and roll_and_process game =
       ^ "'s resources are:"
       ^ string_of_resources updated_player.resources
       ^ "\n");
-    b;
-  else game
+    b)
+  else (
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "All players with 8 or more development cards must discard half \
+       of them to the bank.";
+    game)
 
 and play_card game =
   let current_player = List.nth game.players game.current_player in
