@@ -12,8 +12,6 @@ type command =
   | Settle
   | BuildRoad
   | PlayCard
-  | Rob
-  | Trade
   | EndTurn
   | CheckResources
   | CheckSettlements
@@ -30,8 +28,6 @@ let parse_string str =
   | "settle" -> Settle
   | "build road" -> BuildRoad
   | "play card" -> PlayCard
-  | "rob" -> Rob
-  | "trade" -> Trade
   | "end turn" -> EndTurn
   | "check resources" -> CheckResources
   | "check settlements" -> CheckSettlements

@@ -23,7 +23,6 @@ let string_of_color = function
   | White -> "White"
 
 type development_card =
-  | Knight
   | VictoryPoint
   | Monopoly
   | YearofPlenty
@@ -84,7 +83,6 @@ let resource_of_string str =
 
 let string_of_card res =
   match res with
-  | Knight -> "Knight"
   | VictoryPoint -> "VictoryPoint"
   | Monopoly -> "Monopoly"
   | YearofPlenty -> "YearofPlenty"
@@ -93,7 +91,6 @@ let string_of_card res =
 
 let card_of_string str =
   match String.lowercase_ascii str with
-  | "knight" -> Knight
   | "victory point" -> VictoryPoint
   | "monopoly" -> Monopoly
   | "year of plenty" -> YearofPlenty
