@@ -12,7 +12,7 @@ Mohammad Hamzah (mh2296)
 **Objective:** The first player to receive 10 Victory Points wins the game 
 
 **Set-Up:**
-At the start of every turn, a player should roll the dice. The dice roll corresponds to one or two tiles on the board; resources from those tiles will be added to the player’s resource list. To roll, a player should type **roll**. 
+At the start of every turn, a player should roll the dice. The dice roll corresponds to one or two tiles on the board; resources from those tiles will be added to the player’s resource list. To roll, a player should type **roll**. Typically, Catan is played where a player can build as many settlements and roads and buy as many development cards as they wish per turn, but they can only play one development card per turn. Players should do their best to adhere to this rule throughout the duration of the game. 
 
 **Construction:** 
 
