@@ -118,8 +118,6 @@ let rec game_loop game =
       let new_game = new_road game current_player in
       game_loop new_game
   | PlayCard -> play_card game
-  | Rob -> failwith "Unimplemented"
-  | Trade -> failwith "Unimplemented"
   | EndTurn ->
       let new_game =
         {
@@ -171,12 +169,6 @@ and start initial_game_state =
 and quit game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Thank you for playing Settlers of Caml-tan! See you next time! \n"
-
-(* and roll game = let p, q = roll_dice () in let current_player =
-   List.nth game.players game.current_player in
-   ANSITerminal.print_string [ ANSITerminal.blue ] (string_of_color
-   current_player.player_color ^ " has rolled a " ^ string_of_int (p +
-   q) ^ "! \n") *)
 
 and settle game player =
   let current_player = List.nth game.players game.current_player in
@@ -418,7 +410,6 @@ and play_card game =
       ^ ". What would you like to play? \n");
   let cmd_str = read_line () in
   match cmd_str with
-  | "knight" -> failwith "unimplemented"
   | "victory point" ->
       let updated_player =
         {

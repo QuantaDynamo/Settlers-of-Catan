@@ -10,8 +10,6 @@ type command =
   | Settle
   | BuildRoad
   | PlayCard
-  | Rob
-  | Trade
   | EndTurn
   | CheckResources
   | CheckSettlements
