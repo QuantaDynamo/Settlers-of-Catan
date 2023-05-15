@@ -186,34 +186,39 @@ and settle game player =
     print_endline "Enter the number of the node you'd like to settle: ";
     let cmd_str = read_line () in
     let cmd = int_of_string cmd_str in
-    let updated_player =
-      {
-        current_player with
-        num_settlements = current_player.num_settlements + 1;
-        score = current_player.score + 1;
-        has_rolled = true;
-        resources = updated_resources;
-      }
-    in
-    let updated_players =
-      List.mapi
-        (fun i p ->
-          if i = game.current_player then updated_player else p)
-        game.players
-    in
-    let b =
-      {
-        nodes = build_settlement cmd current_player game.nodes;
-        edges = game.edges;
-        tiles = game.tiles;
-        current_player = game.current_player;
-        players = updated_players;
-        dice_rolled = true;
-      }
-    in
-    ANSITerminal.print_string [ ANSITerminal.blue ]
-      "You've successfully settled!";
-    b
+    if build_settlement cmd current_player game.nodes <> game.nodes then (
+      let updated_player =
+        {
+          current_player with
+          num_settlements = current_player.num_settlements + 1;
+          score = current_player.score + 1;
+          has_rolled = true;
+          resources = updated_resources;
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = build_settlement cmd current_player game.nodes;
+          edges = game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "You've successfully settled!";
+      b)
+    else (
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "A settlement already exists on that node. Please try again";
+      game)
 
 and new_road game player =
   let current_player = List.nth game.players game.current_player in
@@ -222,8 +227,8 @@ and new_road game player =
     || not (List.mem Brick current_player.resources)
   then (
     ANSITerminal.print_string [ ANSITerminal.blue ]
-      "I'm sorry. You don't have enough resources to settle. Please \
-       try a different command.";
+      "I'm sorry. You don't have enough resources to build a road. \
+       Please try a different command.";
     game)
   else
     let updated_resources =
@@ -234,33 +239,38 @@ and new_road game player =
        road: ";
     let cmd_str = read_line () in
     let cmd = int_of_string cmd_str in
-    let updated_player =
-      {
-        current_player with
-        num_roads = current_player.num_roads + 1;
-        has_rolled = true;
-        resources = updated_resources;
-      }
-    in
-    let updated_players =
-      List.mapi
-        (fun i p ->
-          if i = game.current_player then updated_player else p)
-        game.players
-    in
-    let b =
-      {
-        nodes = game.nodes;
-        edges = build_road cmd current_player game.edges;
-        tiles = game.tiles;
-        current_player = game.current_player;
-        players = updated_players;
-        dice_rolled = true;
-      }
-    in
-    ANSITerminal.print_string [ ANSITerminal.blue ]
-      "You've successfully built a road!";
-    b
+    if build_road cmd current_player game.edges <> game.edges then (
+      let updated_player =
+        {
+          current_player with
+          num_roads = current_player.num_roads + 1;
+          has_rolled = true;
+          resources = updated_resources;
+        }
+      in
+      let updated_players =
+        List.mapi
+          (fun i p ->
+            if i = game.current_player then updated_player else p)
+          game.players
+      in
+      let b =
+        {
+          nodes = game.nodes;
+          edges = build_road cmd current_player game.edges;
+          tiles = game.tiles;
+          current_player = game.current_player;
+          players = updated_players;
+          dice_rolled = true;
+        }
+      in
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "You've successfully built a road!";
+      b)
+    else (
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "A road already exists on that edge. Please try again.";
+      game)
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]

@@ -294,15 +294,6 @@ let build_road ind player board =
       else get_edge e.edge_id board)
     board
 
-(* let build_road ind player = print_endline "Please enter the node IDs
-   for the start and end of the road:"; let start_node_id = read_int ()
-   in let end_node_id = read_int () in let start_node = List.find (fun n
-   -> n.node_id = start_node_id) board.nodes in let end_node = List.find
-   (fun n -> n.node_id = end_node_id) board.nodes in let new_road = {
-   road_id = Random.int 10 + 1; start_node; end_node; owner = player;
-   is_connected = true; } in board.roads <- new_road :: board.roads;
-   print_endline "Road built successfully!" *)
-
 let build_settlement ind player board =
   List.map
     (fun n ->
