@@ -8,6 +8,7 @@ type tile = {
   dice_num : int;
   has_robber : bool;
 }
+(** [tile] represents the tile and its resources and game settings *)
 
 type node
 (** [node] represents the node where a players can setle *)
