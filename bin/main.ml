@@ -62,13 +62,13 @@ let remove_one_resource
     (fun res -> not (List.mem res unwanted_resources))
     player.resources
 
-let remove_resource (resources : resource list) (res : resource) :
-    resource list =
-  let rec remove acc = function
-    | [] -> acc
-    | r :: rs -> if r = res then remove acc rs else remove (r :: acc) rs
-  in
-  remove [] resources
+let rec remove_first_instances resources player_resources =
+  match resources with
+  | [] -> player_resources
+  | r :: rest -> (
+      match List.partition (fun x -> x = r) player_resources with
+      | [], _ -> remove_first_instances rest player_resources
+      | x :: xs, ys -> xs @ ys |> remove_first_instances rest)
 
 let remove_card
     (player : player)
@@ -87,19 +87,20 @@ let remove_card
 let rec game_loop game =
   ignore (Sys.command "clear");
   let current_player = List.nth game.players game.current_player in
-  if current_player.score >= 10 then
+  if current_player.score >= 10 then (
     ANSITerminal.print_string [ ANSITerminal.green ]
       ("Congratulations, "
       ^ string_of_color current_player.player_color
-      ^ " has won the game!\n")
+      ^ " has won the game!\n");
+    quit game)
   else Board.draw_board game.tiles game.nodes game.edges;
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("It's "
     ^ string_of_color current_player.player_color
     ^ "'s turn.\n");
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "What would you like to do now? (roll, quit, settle, rob, trade, \
-     play card, end turn, buy card) \n\
+    "What would you like to do now? (roll, settle, build road, buy \
+     card, play card, end turn, quit) \n\
      >";
   let cmd_str = read_line () in
   let cmd = parse_string cmd_str in
@@ -157,12 +158,6 @@ and start initial_game_state =
     List.nth initial_game_state.players
       initial_game_state.current_player
   in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    ("Hello! You are now playing Settlers of Caml-tan. The current \
-      player is "
-    ^ string_of_color current_player.player_color
-    ^ ". Please place two settlements and two roads coming from each \
-       settlement. Then, end your turn. \n");
   let new_game = game_loop initial_game_state in
   start new_game
 
@@ -182,7 +177,12 @@ and settle game player =
       "I'm sorry. You don't have enough resources to settle. Please \
        try a different command.";
     game)
-  else (
+  else
+    let updated_resources =
+      remove_first_instances
+        [ Wood; Brick; Sheep; Wheat ]
+        current_player.resources
+    in
     print_endline "Enter the number of the node you'd like to settle: ";
     let cmd_str = read_line () in
     let cmd = int_of_string cmd_str in
@@ -192,6 +192,7 @@ and settle game player =
         num_settlements = current_player.num_settlements + 1;
         score = current_player.score + 1;
         has_rolled = true;
+        resources = updated_resources;
       }
     in
     let updated_players =
@@ -212,7 +213,7 @@ and settle game player =
     in
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "You've successfully settled!";
-    b)
+    b
 
 and new_road game player =
   let current_player = List.nth game.players game.current_player in
@@ -224,7 +225,10 @@ and new_road game player =
       "I'm sorry. You don't have enough resources to settle. Please \
        try a different command.";
     game)
-  else (
+  else
+    let updated_resources =
+      remove_first_instances [ Wood; Brick ] current_player.resources
+    in
     print_endline
       "Enter the number of the edge where you'd like to build your \
        road: ";
@@ -235,6 +239,7 @@ and new_road game player =
         current_player with
         num_roads = current_player.num_roads + 1;
         has_rolled = true;
+        resources = updated_resources;
       }
     in
     let updated_players =
@@ -255,7 +260,7 @@ and new_road game player =
     in
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "You've successfully built a road!";
-    b)
+    b
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
@@ -452,11 +457,16 @@ and play_card game =
           (fun acc p ->
             if p = current_player then acc
             else
-              let resources = remove_resource p.resources res in
+              let resources =
+                List.filter (fun r -> r <> res) p.resources
+              in
               let num_removed =
                 List.length p.resources - List.length resources
               in
-              List.append (List.init num_removed (fun _ -> res)) acc)
+              let removed_resources =
+                List.init num_removed (fun _ -> res)
+              in
+              List.append removed_resources acc)
           [] game.players
       in
       let updated_player =
