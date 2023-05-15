@@ -1,6 +1,6 @@
-(* Test Plan: The Board and Command modules are manually tested here.
+(* Test Plan: The Board and Command modules are tested here.
    The other modules-- Gamestate, and Player-- are not tested
-   automatically since they are mostly used in the terminal, or are
+   automatically since they are mostly used in the terminal, or have
    helper type_to_string functions for other functions which we do test.
    Instead, we throughly test the Commamand and Board modules. First, we
    used black box testing and test-driven development while implementing
