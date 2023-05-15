@@ -335,7 +335,6 @@ let get_resource ind =
   |> List.filter (fun dice -> dice.dice_num = ind)
   |> List.map (fun res -> (res.tile_id, res.resource))
 
-
 (* The color of player pl as an ANSITERMINAL.color *)
 let get_color (pl : player option) =
   match pl with

@@ -2,5 +2,5 @@
  (name catan)
  (public_name Catan)
  (libraries yojson ANSITerminal)
- (instrumentation 
- (backend bisect_ppx)))
+ (instrumentation
+  (backend bisect_ppx)))
