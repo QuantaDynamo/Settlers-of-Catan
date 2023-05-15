@@ -92,7 +92,7 @@ let rec game_loop game =
       ("Congratulations, "
       ^ string_of_color current_player.player_color
       ^ " has won the game!\n");
-    quit game)
+    exit 0)
   else Board.draw_board game.tiles game.nodes game.edges;
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("It's "
