@@ -46,21 +46,10 @@ type board = {
   mutable roads : road list;
   players : player list;
 }
-
 (* type board = { nodes : node list; edges : edge list; tiles : tile
    list; intersections : intersection list; mutable roads : road list;
    mutable cities : cities list; mutable ports : ports list; mutable
    settlements : settlements list; players : player list; } *)
-
-let test_resource res =
-  match res with
-  | "Wheat" -> Wheat
-  | "Sheep" -> Sheep
-  | "Brick" -> Brick
-  | "Wood" -> Wood
-  | "Ore" -> Ore
-  | "Desert" -> Desert
-  | _ -> Wheat
 
 let string_resource res =
   match res with
