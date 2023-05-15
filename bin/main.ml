@@ -564,6 +564,8 @@ and play_card game =
           development_cards =
             remove_card current_player current_player.development_cards
               (card_of_string "road building");
+          resources =
+            Wood :: Wood :: Brick :: Brick :: current_player.resources;
         }
       in
       let updated_players =
