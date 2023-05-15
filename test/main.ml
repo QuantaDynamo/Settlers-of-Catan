@@ -6,11 +6,15 @@
    used black box testing and test-driven development while implementing
    the Board module. This meant testing all the getters and setters for
    the nodes, edges, and tiles, as well as getting resources. For the
-   command file, we also tested the parse_string file, to make sure
+   command file, we tested the parse_string file, to make sure
    commands correctly route to right commands for the game loop. After
-   that, we used Bisect to make sure we were'nt undertesting Board and
+   that, we used Bisect to make sure we weren't undertesting Board and
    Command. Command has 100% coverage and Board is at 97%, with the only
-   functions not being covered being string helper functions. *)
+   functions not being covered being string helper functions. 
+   We believe this shows correctness because we use unit tests for all functions
+   used in the game, but we use manual/terminal testing to test user behaviour.
+   All the functions work how they are supposed to, as shown by the unit
+   tests, but to see how they work together depends on a user. *)
 
 open OUnit2
 open Catan
