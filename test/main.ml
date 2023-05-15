@@ -112,7 +112,6 @@ let player_red =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
-    played_card = false;
   }
 
 let player_blue =
@@ -125,7 +124,6 @@ let player_blue =
     num_cities = 0;
     num_roads = 0;
     has_rolled = false;
-    played_card = false;
   }
 
 let tile_test = tile_list
