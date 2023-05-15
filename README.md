@@ -8,6 +8,7 @@ Mohammad Hamzah (mh2296)
 **Game Rules:**
 
 **Players:** Red & Blue
+
 **Objective:** The first player to receive 10 Victory Points wins the game 
 
 **Set-Up:**
