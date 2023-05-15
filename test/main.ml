@@ -484,8 +484,6 @@ let board_tests =
     | CheckSettlements -> "check settlements"
     | CheckResources -> "check resources"
     | EndTurn -> "end turn"
-    | Trade -> "trade"
-    | Rob -> "rob"
     | PlayCard -> "play card"
     | BuildRoad -> "build road"
     | Settle -> "settle"
@@ -511,8 +509,6 @@ let command_tests =
     parse_string_test "Check CheckSettlements command" "check settlements" CheckSettlements;
     parse_string_test "Check CheckResources command" "check resources" CheckResources;
     parse_string_test "Check EndTurn command" "end turn" EndTurn;
-    parse_string_test "Check Trade command" "trade" Trade;
-    parse_string_test "Check Rob command" "rob" Rob;
     parse_string_test "Check PlayCard command" "play card" PlayCard;
     parse_string_test "Check BuildRoad command" "build road" BuildRoad;
     parse_string_test "Check Settle command" "settle" Settle;
