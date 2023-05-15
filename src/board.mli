@@ -1,3 +1,5 @@
+(** Creates and maintains the board. *)
+
 open Player
 
 type tile = {
@@ -8,21 +10,34 @@ type tile = {
 }
 
 type node
+(** [node] represents the node where a players can setle *)
+
 type edge
+(** [edge] represents the roads between nodes *)
+
 type settlement
+(** [settlement] represents player that settled a node *)
+
 type city
+(** [city] represents an updated settlement *)
+
 type road
+(** [road] represents the edge where owned by a player*)
+
 type port
-type intersection
+(** [port] represents the ports players can use *)
+
 type board
+(** [board] represents nodes, edges, and players *)
+
 
 val tile_list : tile list
 val node_list : node list
 val edge_list : edge list
 val test_resource : string -> resource
-val init_tile : int -> resource -> int -> tile
-val init_node : int -> int list -> int list -> int list -> node
-val init_edge : int -> edge
+(* val init_tile : int -> resource -> int -> tile *)
+(* val init_node : int -> int list -> int list -> int list -> node *)
+(* val init_edge : int -> edge *)
 val string_resource : resource -> string
 val string_of_edge : edge -> string
 val string_of_node : node -> string
@@ -42,12 +57,12 @@ val get_edge : int -> edge list -> edge
     of edges. Requires: [ind] is an integer in the range 0-71 and
     [edges] is a list of type e. *)
 
-val build_road : int -> Player.player -> edge list -> edge list
+val build_road : int -> player -> edge list -> edge list
 (** [build_road ind edge] returns the list of edges including the
     modified edge. Requires: [ind] is an integer in the range 0-71 and
     [edge] is of type e *)
 
-val build_settlement : int -> Player.player -> node list -> node list
+val build_settlement : int -> player -> node list -> node list
 (** [build_settlement ind node] returns the list of nodes including the
     modified node. Requires: [ind] is an integer in the range 0-53 and
     [node] is of type n. *)
@@ -63,7 +78,7 @@ val draw_board : tile list -> node list -> edge list -> unit
     with nodes, edges and tiles. When a user populates a node or edge,
     it is colored to their user color. This function takes the list
     nodes, edges, and tiles and outputs the display:
-                                        <27>---33--<16>
+                                        <27>---33--<16> \n
                                         /             \
                                        39             23
                                       /                 \
