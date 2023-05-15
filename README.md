@@ -5,10 +5,10 @@ Javier Vega (jdv67)
 Xicheng Lin (xl377)
 Mohammad Hamzah (mh2296)
 
-**Settlers of Caml-tan Game Rules:**
+**Game Rules:**
 
 **Players:** Red & Blue
-Objective: The first player to receive 10 Victory Points wins the game 
+**Objective:** The first player to receive 10 Victory Points wins the game 
 
 **Set-Up:**
 At the start of every turn, a player should roll the dice. The dice roll corresponds to one or two tiles on the board; resources from those tiles will be added to the player’s resource list. To roll, a player should type **roll**. 
