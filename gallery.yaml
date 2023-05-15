@@ -26,8 +26,7 @@ demo-video-url: ""
 desc: >
   Our project is a version of the popular board game, Settlers of Catan, and is
   based on the online game, Colonist. Players are able to perform similar 
-  actions to Catan, such as build roads, settlements, and cities; collect 
-  development cards and victory points; place robbers; and trade with other 
-  players. The interface is supported by the terminal, in which players 
-  can type commands to play the game and see their progress displayed on the 
-  hexagonal board. 
+  actions to Catan, such as build roads and settlements; buy and play development cards;
+  and ultimately acquire victory points. The interface is supported by the 
+  terminal, in which players can type commands to play the game and see their 
+  progress displayed on the hexagonal board. 
