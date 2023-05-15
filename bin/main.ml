@@ -223,36 +223,47 @@ and settle game player =
     b)
 
 and new_road game player =
-  print_endline
-    "Enter the number of the edge where you'd like to build your road: ";
-  let cmd_str = read_line () in
-  let cmd = int_of_string cmd_str in
   let current_player = List.nth game.players game.current_player in
-  let updated_player =
-    {
-      current_player with
-      num_roads = current_player.num_roads + 1;
-      has_rolled = true;
-    }
-  in
-  let updated_players =
-    List.mapi
-      (fun i p -> if i = game.current_player then updated_player else p)
-      game.players
-  in
-  let b =
-    {
-      nodes = game.nodes;
-      edges = build_road cmd current_player game.edges;
-      tiles = game.tiles;
-      current_player = game.current_player;
-      players = updated_players;
-      dice_rolled = true;
-    }
-  in
-  ANSITerminal.print_string [ ANSITerminal.blue ]
-    "You've successfully built a road!";
-  b
+  if
+    (not (List.mem Wood current_player.resources))
+    || not (List.mem Brick current_player.resources)
+  then (
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "I'm sorry. You don't have enough resources to settle. Please \
+       try a different command.";
+    game)
+  else (
+    print_endline
+      "Enter the number of the edge where you'd like to build your \
+       road: ";
+    let cmd_str = read_line () in
+    let cmd = int_of_string cmd_str in
+    let updated_player =
+      {
+        current_player with
+        num_roads = current_player.num_roads + 1;
+        has_rolled = true;
+      }
+    in
+    let updated_players =
+      List.mapi
+        (fun i p ->
+          if i = game.current_player then updated_player else p)
+        game.players
+    in
+    let b =
+      {
+        nodes = game.nodes;
+        edges = build_road cmd current_player game.edges;
+        tiles = game.tiles;
+        current_player = game.current_player;
+        players = updated_players;
+        dice_rolled = true;
+      }
+    in
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "You've successfully built a road!";
+    b)
 
 and empty game =
   ANSITerminal.print_string [ ANSITerminal.blue ]
