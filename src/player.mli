@@ -1,3 +1,6 @@
+(** The player, resources, and associated types used in the game 
+    for player properties  *)
+
 type resource =
   | Wheat
   | Sheep
@@ -5,6 +8,8 @@ type resource =
   | Wood
   | Ore
   | Desert
+
+(** [resource] is the possible resources a player can recieve and use  *)
 
 type color =
   | Red
@@ -14,7 +19,10 @@ type color =
   | Brown
   | White
 
+(** [color] is the possible player colors  *)
+
 type development_card
+(** [development_card] is a card a player can earn and use  *)
 
 type player = {
   player_color : color;
@@ -26,8 +34,10 @@ type player = {
   num_roads : int;
   mutable has_rolled : bool;
 }
+(** [player] is the player type  *)
 
 val player_test : player
+(** [player_test] is a practice player for testing *)
 
 val string_color : color -> string
 (** [string_color] returns the string version of a color. Requires:

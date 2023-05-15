@@ -1,6 +1,6 @@
-(* Test Plan: The Board and Command modules are manually tested here.
+(* Test Plan: The Board and Command modules are tested here.
    The other modules-- Gamestate, and Player-- are not tested
-   automatically since they are mostly used in the terminal, or are
+   automatically since they are mostly used in the terminal, or have
    helper type_to_string functions for other functions which we do test.
    Instead, we throughly test the Commamand and Board modules. First, we
    used black box testing and test-driven development while implementing
@@ -129,12 +129,12 @@ let player_blue =
 let tile_test = tile_list
 let node_test = node_list
 let edge_test = edge_list
-let wheat_test = test_resource "Wheat"
-let desert_test = test_resource "Desert"
-let brick_test = test_resource "Brick"
-let sheep_test = test_resource "Sheep"
-let wood_test = test_resource "Wood"
-let ore_test = test_resource "Ore"
+let wheat_test = Wheat
+let desert_test = Desert
+let brick_test = Brick
+let sheep_test = Sheep
+let wood_test = Wood
+let ore_test = Ore
 let test_edges_basic = build_road 4 player_red Board.edge_list
 
 let test_edges_sequence =
