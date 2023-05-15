@@ -317,10 +317,15 @@ and buy_card game =
       "What card would you like to buy? \n";
     let card = read_line () in
     let add_card = card_of_string card in
+    let updated_resources =
+      remove_first_instances [ Wheat; Ore; Sheep ]
+        current_player.resources
+    in
     let updated_player =
       {
         current_player with
         development_cards = add_card :: current_player.development_cards;
+        resources = updated_resources;
       }
     in
     let updated_players =
