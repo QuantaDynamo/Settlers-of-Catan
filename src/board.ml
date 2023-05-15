@@ -156,7 +156,7 @@ let tile_list =
     init_tile 15 Wood 11;
     init_tile 16 Wheat 11;
     init_tile 17 Wood 4;
-    init_tile 18 Sheep 8;
+    init_tile 18 Sheep 7;
   ]
 
 let edge_list =
@@ -809,7 +809,7 @@ let draw_board tiles nodes edges =
   ANSITerminal.print_string [] "\n";
   ANSITerminal.print_string [] "   ";
   draw_node 52 "52" nodes;
-  draw_tile 18 "   D8 Sheep 18   " tiles;
+  draw_tile 18 "   D7 Sheep 18   " tiles;
   draw_node 44 "44" nodes;
   draw_edge 52 "---52--" edges;
   draw_node 34 "34" nodes;
